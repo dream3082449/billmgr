@@ -1,0 +1,12 @@
+clouds:
+  openstack:
+    auth:
+      auth_url: http://10.10.84.135:5000/v3/
+      username: "admin"
+      password: "qwerty"
+      project_id: 4b0a57842ea34e209ff2d5b150ab2a6b
+      project_name: "admin"
+      user_domain_name: "Default"
+    region_name: "RegionOne"
+    interface: "public"
+    identity_api_version: 3
