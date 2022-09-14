@@ -27,7 +27,7 @@ class oops_helper(object):
         self.mysql_cursor.execute(query, [product_id,])
         try:
             user_id, username = self.mysql_cursor.fetchone()
-        except ValueError:
+        except Exception:
             return None
 
         if username_only:
