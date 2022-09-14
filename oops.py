@@ -29,7 +29,7 @@ class oops_helper(object):
         if username_only:
             return username
         else:
-            return (user_id, username)
+            return (user_id, username) or None
 
 
     def get_or_create_user(self, username):
