@@ -1,9 +1,6 @@
-#!env python
-#!/usr/bin/python
-import pymysql as MySQLdb
+#!env python3
 import sys
 import openstack
-#import mysql
 import MySQLdb  
 
 
