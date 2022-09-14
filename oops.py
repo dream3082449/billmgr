@@ -20,7 +20,7 @@ class oops_helper(object):
     }
 
     mysql_conn = MySQLdb.connect(**mysql_params)
-    mysql_cursor = mysql_conn.cursor(prepared=True)
+    mysql_cursor = mysql_conn.cursor()
 
     # Initialize connection
     conn = openstack.connect(cloud='openstack')
