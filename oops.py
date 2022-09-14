@@ -16,7 +16,7 @@ class oops_helper(object):
         "port": 3306,
         "user": "os_user",
         "passwd": "dtpe,kbq",
-#        "db": "billing"
+        "db": "billmgr"
     }
 
     mysql_conn = MySQLdb.connect(**mysql_params)
@@ -27,7 +27,7 @@ class oops_helper(object):
 
     def product_id_to_username(self, product_id, username_only=True):
         query = 'select a.id, a.name from item i left join account a on i.account=a.id where i.id = %s'
-        self.mysql_cursor.execute(query, (product_id))
+        self.mysql_cursor.execute(query, [product_id,])
         user_id, username = self.mysql_cursor.fetchone()
         if username_only:
             return username
