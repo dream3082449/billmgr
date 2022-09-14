@@ -25,11 +25,15 @@ class oops_helper(object):
     def product_id_to_username(self, product_id, username_only=True):
         query = 'select a.id, a.name from item i left join account a on i.account=a.id where i.id = %s'
         self.mysql_cursor.execute(query, [product_id,])
-        user_id, username = self.mysql_cursor.fetchone()
+        try:
+            user_id, username = self.mysql_cursor.fetchone()
+        except:
+            return None
+
         if username_only:
             return username
         else:
-            return (user_id, username) or None
+            return (user_id, username)
 
 
     def get_or_create_user(self, username):
