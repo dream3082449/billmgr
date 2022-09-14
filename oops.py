@@ -12,17 +12,28 @@ openstack.enable_logging(True, stream=sys.stdout)
 class oops_helper(object):
 
     mysql_params = {
-        "host": "localhost",
+        "host": "10.10.84.186",
         "port": 3306,
-        "user": "huy",
-        "passwd": "pizda_djigurda",
+        "user": "os_user",
+        "passwd": "dtpe,kbq",
 #        "db": "billing"
     }
 
     mysql_conn = MySQLdb.connect(**mysql_params)
+    mysql_cursor = mysql_conn.cursor(prepared=True)
 
     # Initialize connection
     conn = openstack.connect(cloud='openstack')
+
+    def product_id_to_username(self, product_id, username_only=True):
+        query = 'select a.id, a.name from item i left join account a on i.account=a.id where i.id = %s'
+        self.mysql_cursor.execute(query, (product_id))
+        user_id, username = self.mysql_cursor.fetchone()
+        if username_only:
+            return username
+        else:
+            return (user_id, username)
+
 
     def get_or_create_user(self, username):
         response = self.conn.identity.find_user(username, ignore_missing=True)
