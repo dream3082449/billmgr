@@ -12,7 +12,7 @@ for e, p in enumerate(sys.argv):
 	k, v = p.replace('--', '').split('=')
 	params[k] =v
 	
-conn = sqlite3.connect('queues.db')
+conn = sqlite3.connect('/opt/billmgr/queues.db')
 cursor = conn.cursor()
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS queue(
