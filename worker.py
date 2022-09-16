@@ -20,15 +20,17 @@ class VMDaemon(Daemon):
         output.close()
 
     def get_queue(self):
-        # c = self.cur.execute("""
-        #     SELECT * from queue where is_done=false order by created ASC LIMIT 1
-        #     """).fetchall()
-        return None
+        c = self.cur.execute("""
+            SELECT * from queue where is_done=false order by created ASC LIMIT 1
+            """).fetchall()
+        return c
 
     def ident_comand (self,command ):
-
+        helper = oops_helper()
         if command == "open":
             print(command)
+#            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
+#            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
 #            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 1)""")
         elif command == "close":
             print(command)
@@ -49,6 +51,7 @@ class VMDaemon(Daemon):
 
 
     def parse_data(self, data):
+        raise Exception(data)
         parsed_data = 'Huy'
         return parsed_data
 
