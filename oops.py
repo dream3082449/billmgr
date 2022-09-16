@@ -44,7 +44,7 @@ class oops_helper(object):
             return self.conn.identity.create_user(**{'name':username})
 
 
-    def list_projects(conn):
+    def get_or_create_project(conn):
         #print("List Projects:")
 
         for project in conn.identity.projects():
@@ -56,6 +56,9 @@ class oops_helper(object):
         for service in conn.identity.services():
             print(service)
 
-
+    def create_instance(conn, params):
+        #product_id_to_username()
+        #get_or_create_project()
+        pass
 
 
