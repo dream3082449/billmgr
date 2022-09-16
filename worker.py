@@ -5,9 +5,9 @@ import sqlite3
 from oops import oops_helper
 
 from daemon import Daemon
-PIDFILE = 'vmdaemon.pid'
-LOGFILE = 'vmdaemon.log'
-DBNAME = 'queues.db'
+PIDFILE = '/opt/billmgr/vmdaemon.pid'
+LOGFILE = '/opt/billmgr/vmdaemon.log'
+DBNAME = '/opt/billmgr/queues.db'
 
 class VMDaemon(Daemon):
     conn = sqlite3.connect(DBNAME)
@@ -133,6 +133,6 @@ if __name__ == '__main__':
     elif len(sys.argv) == 2:
         arg = sys.argv[1]
         if arg in ('start', 'stop', 'restart'):
-            d = VMDaemon(PIDFILE, verbose=0)
+            d = VMDaemon(PIDFILE, verbose=9)
             getattr(d, arg)()
 
