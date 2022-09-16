@@ -1,0 +1,1 @@
+open {"cpu": "2", "hdd": "20", "ippool": "1", "ostempl": "ubuntu-base", "password": "2P9FaAJlRe33", "ram": "4", "user": "user11384", "vgpu1080": "off", "request_id": "6419e4f2-3513-11ed-9815-005056b6703a", "indent_id": "6419e81c-3513-11ed-9815-005056b6703a"}

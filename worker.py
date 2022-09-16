@@ -1,34 +1,34 @@
 #!/usr/bin/env python3
-import os, sys, time
+import os, sys, time, json
 import unittest
 import sqlite3
-from oops import oops_helper
+#from oops import oops_helper
 
 from daemon import Daemon
-PIDFILE = '/opt/billmgr/vmdaemon.pid'
-LOGFILE = '/opt/billmgr/vmdaemon.log'
-DBNAME = '/opt/billmgr/queues.db'
+PIDFILE = 'vmdaemon.pid'
+LOGFILE = 'vmdaemon.log'
+DBNAME = 'queues.db'
 
 class VMDaemon(Daemon):
     conn = sqlite3.connect(DBNAME)
     cur = conn.cursor()
 
-    def __init__(self, *args, **kwargs):
-        super(VMDaemon, self).__init__(*args, **kwargs)
-        output = open(LOGFILE, 'w')
-        output.write('inited')
-        output.close()
+#    def __init__(self, *args, **kwargs):
+#        super(VMDaemon, self).__init__(*args, **kwargs)
+#        output = open(LOGFILE, 'w')
+#        output.write('inited')
+#        output.close()
 
     def get_queue(self):
         c = self.cur.execute("""
-            SELECT * from queue where is_done=false order by created ASC LIMIT 1
+            SELECT params from queue where is_done=false and on_process=false order by created ASC LIMIT 1
             """).fetchall()
         return c
 
-    def ident_comand (self,command ):
-        helper = oops_helper()
+    def ident_comand (self,command, params):
+#        helper = oops_helper()
         if command == "open":
-            print(command)
+            raise Exception(params)
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
 #            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 1)""")
@@ -47,13 +47,10 @@ class VMDaemon(Daemon):
 
         return 'Huy 22'
 
-           
-
-
     def parse_data(self, data):
-        raise Exception(data)
-        parsed_data = 'Huy'
-        return parsed_data
+        r = json.loads(data[0][0])
+        c = r.pop('commandfile')
+        return (c, r)
 
     def run(self):
         time.sleep(0.3)
@@ -64,9 +61,9 @@ class VMDaemon(Daemon):
             if data:
                 for row in data:
                     #do something
-                    p = self.parse_data(data)
-                    output.write(p)
-                    res = self.ident_comand(p)
+                    command, params = self.parse_data(data)
+                    output.write(f"%s %s" % (command, json.dumps(params)))
+                    res = self.ident_comand(command, params)
                     output.write(res)
 
             else:
