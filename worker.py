@@ -2,7 +2,7 @@
 import os, sys, time
 import unittest
 import sqlite3
-from .oops import oops_helper
+from oops import oops_helper
 
 from daemon import Daemon
 PIDFILE = 'vmdaemon.pid'
