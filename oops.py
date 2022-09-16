@@ -50,6 +50,12 @@ class oops_helper(object):
         for project in conn.identity.projects():
             project = list_p
 
+    def get_or_create_flavor(conn, project):
+        pass
+
+    def get_free_hive_gpu(conn):
+        pass
+
     def list_services(conn):
         print("List Services:")
 
@@ -59,6 +65,15 @@ class oops_helper(object):
     def create_instance(conn, params):
         #product_id_to_username()
         #get_or_create_project()
+        #get_or_create_flavor()
+        #get_free_hive_gpu()
+
+        #logic for creating instance in project with flavor and hive gpu
         pass
 
+    def reomve_instance(conn, params):
+        pass
+
+    def change_flavor(conn, params):
+        pass
 
