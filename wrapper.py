@@ -23,8 +23,27 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS queue(
     is_done INTEGER DEFAULT 0,
     params TEXT,
     result TEXT);""")
+conn.commit()
+
+cursor.execute("""CREATE TABLE IF NOT EXISTS users(
+    id INTEGER PRIMARY KEY,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    username TEXT,
+    project TEXT,
+    email TEXT);""")
     
 conn.commit()
+
+cursor.execute("""CREATE TABLE IF NOT EXISTS instances(
+    id INTEGER PRIMARY KEY,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER DEFAULT 0,
+    openstack_uuid TEXT,
+    project TEXT,
+    params TEXT);""")
+    
+conn.commit()
+
 params['request_id'] = str(uuid.uuid1())
 
 if params['commandfile'] =='open':

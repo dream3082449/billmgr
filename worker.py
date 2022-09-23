@@ -25,10 +25,40 @@ class VMDaemon(Daemon):
             """).fetchall()
         return c
 
+    def insert_or_update_user(self, params):
+        c = self.cur.execute("""
+            SELECT id from users where username=%s
+            """, [params.get('username')]).fetchall()
+        if not c:
+            self.cur.execute("""
+                INSERT INTO users (id, username, project, email) VALUES (?, ?, ?, ?);
+                """, params)
+        else:
+            self.cur.execute("""
+                UPDATE users set email=%s where username=%s
+                """, [params[3], params[1]])
+        return None
+
     def ident_comand (self,command, params):
-#        helper = oops_helper()
+        helper = oops_helper()
         if command == "open":
-            raise Exception(params)
+            user_id, username, email = helper.product_id_to_username(params.get('user'))
+
+            project_name = '{0}_project'.format(username)
+
+            user_params = [user_id, username, project_name, email]
+            self.insert_or_update_user(user_params)
+
+            project = helper.get_or_create_project(project_name=project_name)
+
+            attrs = {'username':username,
+                'password':params.get('password'),
+                'project_id': project.get('id'),
+                'email':email}
+            user = helper.get_or_create_user(**attrs)
+
+            helper.update_project_quotes(project)
+
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
 #            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 1)""")
