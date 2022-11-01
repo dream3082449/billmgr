@@ -2,6 +2,8 @@
 import os, sys, time, json
 import unittest
 import sqlite3
+import uuid
+
 #from oops import oops_helper
 
 from daemon import Daemon
@@ -57,7 +59,37 @@ class VMDaemon(Daemon):
                 'email':email}
             user = helper.get_or_create_user(**attrs)
 
-            helper.update_project_quotes(project)
+            quotas_dict = {
+                "cpu": params.get('cpu', None),
+               #"hdd": params.get('hdd', None),
+                "ram": params.get('ram', None),
+                "instance": params.get('instance', None)
+            }
+
+            helper.update_project_quotes(project, quotas_dict)
+
+            flavor_id = uuid.uuid1()
+            flavor_params = {
+                "name": "{0}_flavor_{1}".format(project_name, flavor_id)
+                "ram":params.get('ram', None),
+                "disk":params.get('disk', None),
+                "vcpus":params.get('vcpus', None),
+                "is_public": False,
+            }
+
+            flavor = helper.create_flavor(project, flavor_params)
+            self.cur.execute("""
+                INSERT INTO flavors (project_id, flavor_id) VALUES (?, ?); 
+            """, [project.get('id'), flavor.get('id')])
+
+
+
+#            instance_params = {
+#                "os": params.get('ostempl')
+#            }
+#            helper.create_instance(project, instance_params)
+
+
 
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135

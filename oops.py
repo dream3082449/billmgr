@@ -62,11 +62,39 @@ class oops_helper(object):
             }
             return self.conn.create_project(**attrs)
 
-    def update_project_quotes(self, project):
-        pass
+    def update_project_quotes(self, project, params):
+        project_id = project.get('id')
+        current_quotas = self.conn.get_compute_quotas(project_id)
 
-    def get_or_create_flavor(conn, project):
-        pass
+        if current_quotas.get('instances') < params.get('instance'):
+            instances = params.get('instance')
+        else:
+            instances = current_quotas.get('instances') + params.get('instance')
+
+        if current_quotas.get('cores') < params.get('cpu'):
+            cores = params.get('instance')
+        else:
+            cores = current_quotas.get('cores') + params.get('cpu')
+
+        new_ram = params.get('ram') * 1024 # bump Gigabytes to megabytes for OpenStack cli
+
+        if current_quotas.get('ram') < new_ram:
+            ram = new_ram
+        else:
+            ram = current_quotas.get('ram') + new_ram
+
+        p = {
+            "cores": cores,
+            "instances": instances,
+            "ram": ram,
+        }
+        self.conn.set_compute_quotas(project_id, **p)
+        return True
+
+    def create_flavor(self, project, params):
+        flavor = self.conn.create_flavor(**params)
+        conn.add_flavor_access(flavor.get('id'), project.get('id'))
+        return flavor
 
     def get_free_hive_gpu(conn):
         pass
@@ -77,7 +105,7 @@ class oops_helper(object):
         for service in conn.identity.services():
             print(service)
 
-    def create_instance(conn, params):
+    def create_instance(self, params):
         #product_id_to_username()
         #get_or_create_project()
         #get_or_create_flavor()
