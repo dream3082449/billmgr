@@ -43,7 +43,7 @@ class oops_helper(object):
         else:
             attrs = {
                 'name':username,
-                'password'`:password,
+                'password':password,
                 'default_project_id': project_id,
                 'email': email,
                 'is_enabled': True
