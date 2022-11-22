@@ -34,6 +34,15 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS users(
     
 conn.commit()
 
+cursor.execute("""CREATE TABLE IF NOT EXISTS flavors(
+    id INTEGER PRIMARY KEY,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    project_id TEXT,
+    flavor_id TEXT
+    instance_id TEXT);""")
+    
+conn.commit()
+
 cursor.execute("""CREATE TABLE IF NOT EXISTS instances(
     id INTEGER PRIMARY KEY,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -57,3 +66,5 @@ conn.commit()
 
 
 cursor.close()
+
+
