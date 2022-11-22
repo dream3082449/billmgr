@@ -64,9 +64,16 @@ class oops_helper(object):
 
     def update_project_quotes(self, project):
         pass
+        #p = {'cores':5, 'ram':51300, 'instances':-1}
+        #conn.set_compute_quotas(conn.current_project_id, **p)
+        #conn.get_compute_quotas(conn.current_project_id)
 
     def get_or_create_flavor(conn, project):
         pass
+        #conn.get_flavor_by_id ("05f22826-95a2-4e2c-8367-30b499db35c6")
+        #p={'name':'auto1111-2','ram':2000, 'vcpus': 3, 'disk': 30, 'flavor_id':'0833ecc0-dc7b-4760-9c0a-7f2d31043c02'}
+        #conn.create_flavor (**p)
+        #conn.add_flavor_access('0833ecc0-dc7b-4760-9c0a-7f2d31043c01', '0833ecc0-dc7b-4760-9c0a-7f2d31043c01')
 
     def get_free_hive_gpu(conn):
         pass
