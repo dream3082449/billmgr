@@ -106,10 +106,29 @@ class oops_helper(object):
             print(service)
 
     def create_instance(self, params):
-        #product_id_to_username()
-        #get_or_create_project()
-        #get_or_create_flavor()
-        #get_free_hive_gpu()
+        image = conn.find_image(params.get("ostmpl"))
+        p = {"server" : {
+            "adminPass": params.get("password"),
+#            "accessIPv4": "1.2.3.4",
+#            "accessIPv6": "80fe::",
+            "name" : "new-server-test",
+            "imageRef" : "70a599e0-31e7-49b7-b260-868f441e862b",
+            "flavorRef" : "6",
+            "OS-DCF:diskConfig": "AUTO",
+            "metadata" : {
+                "My Server Name" : "Apache1"
+            },
+            "security_groups": [
+                {
+                    "name": "default"
+                }
+            ],
+            "user_data" : "IyEvYmluL2Jhc2gKL2Jpbi9zdQplY2hvICJJIGFtIGluIHlvdSEiCg==",
+            "networks": "auto",
+#            "host": "openstack-node-01",
+#            "hypervisor_hostname": "openstack-node-01"
+            }
+        }
 
         #logic for creating instance in project with flavor and hive gpu
         pass

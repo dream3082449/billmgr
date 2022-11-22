@@ -84,10 +84,11 @@ class VMDaemon(Daemon):
 
 
 
-#            instance_params = {
-#                "os": params.get('ostempl')
-#            }
-#            helper.create_instance(project, instance_params)
+            instance_params = {
+                "os": params.get('ostempl'),
+                "flavor": flavor,
+            }
+            helper.create_instance(project, instance_params)
 
 
 
