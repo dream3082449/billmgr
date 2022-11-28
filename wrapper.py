@@ -66,7 +66,7 @@ params['request_id'] = str(uuid.uuid1())
 
 if not params:
     print("Database init")
-    return None
+    quit()
 elif params['commandfile'] =='open':
 	params['indent_id'] = str(uuid.uuid1())
 else:
