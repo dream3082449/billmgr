@@ -12,14 +12,15 @@ LOGFILE = 'vmdaemon.log'
 DBNAME = 'queues.db'
 
 class VMDaemon(Daemon):
+    def __init__(self, *args, **kwargs):
+        super(VMDaemon, self).__init__(*args, **kwargs)
+        output = open(LOGFILE, 'w')
+        output.write('inited')
+        output.close()
+
     conn = sqlite3.connect(DBNAME)
     cur = conn.cursor()
 
-#    def __init__(self, *args, **kwargs):
-#        super(VMDaemon, self).__init__(*args, **kwargs)
-#        output = open(LOGFILE, 'w')
-#        output.write('inited')
-#        output.close()
 
     def get_queue(self):
         c = self.cur.execute("""
