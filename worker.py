@@ -4,7 +4,7 @@ import unittest
 import sqlite3
 import uuid
 
-#from oops import oops_helper
+from oops import oops_helper
 
 from daemon import Daemon
 PIDFILE = 'vmdaemon.pid'
