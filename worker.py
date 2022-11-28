@@ -10,17 +10,17 @@ from daemon import Daemon
 PIDFILE = 'vmdaemon.pid'
 LOGFILE = 'vmdaemon.log'
 DBNAME = 'queues.db'
+DEBUG=True
 
 class VMDaemon(Daemon):
-    def __init__(self, *args, **kwargs):
-        super(VMDaemon, self).__init__(*args, **kwargs)
-        output = open(LOGFILE, 'w')
-        output.write('inited')
-        output.close()
+#    def __init__(self, *args, **kwargs):
+#        super(VMDaemon, self).__init__(*args, **kwargs)
+#        output = open(LOGFILE, 'w')
+#        output.write('inited')
+#        output.close()
 
     conn = sqlite3.connect(DBNAME)
     cur = conn.cursor()
-
 
     def get_queue(self):
         c = self.cur.execute("""
@@ -217,6 +217,6 @@ if __name__ == '__main__':
     elif len(sys.argv) == 2:
         arg = sys.argv[1]
         if arg in ('start', 'stop', 'restart'):
-            d = VMDaemon(PIDFILE, verbose=9)
+            d = VMDaemon(pidfile=PIDFILE, verbose=9)
             getattr(d, arg)()
 
