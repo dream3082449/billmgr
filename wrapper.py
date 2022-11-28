@@ -64,6 +64,7 @@ conn.commit()
 
 params['request_id'] = str(uuid.uuid1())
 
+print(params)
 if not params:
     print("Database init")
     quit()
