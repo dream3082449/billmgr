@@ -64,8 +64,7 @@ conn.commit()
 
 params['request_id'] = str(uuid.uuid1())
 
-print(params)
-if not params:
+if not params.get("commandfile"):
     print("Database init")
     quit()
 elif params['commandfile'] =='open':
