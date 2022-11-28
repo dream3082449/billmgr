@@ -99,39 +99,27 @@ class oops_helper(object):
     def get_free_hive_gpu(conn):
         pass
 
-    def list_services(conn):
-        print("List Services:")
-
-        for service in conn.identity.services():
-            print(service)
+    def list_images(self):
+        return [(i.id, i.name, i.created_at) for i in sorted(conn.list_images(), key=lambda d:d['created_at'])]
 
     def create_instance(self, params):
-        image = conn.find_image(params.get("ostmpl"))
         p = {"server" : {
             "adminPass": params.get("password"),
-#            "accessIPv4": "1.2.3.4",
-#            "accessIPv6": "80fe::",
-            "name" : "new-server-test",
-            "imageRef" : "70a599e0-31e7-49b7-b260-868f441e862b",
-            "flavorRef" : "6",
+            "name" : params.get("instance_name"),
+            "imageRef" : params.get("os_image_id"),
+            "flavorRef" : params.get("flavor_id"),
             "OS-DCF:diskConfig": "AUTO",
             "metadata" : {
-                "My Server Name" : "Apache1"
+                "My Server Name" : params.get("meta_name"),
             },
-            "security_groups": [
-                {
-                    "name": "default"
-                }
-            ],
-            "user_data" : "IyEvYmluL2Jhc2gKL2Jpbi9zdQplY2hvICJJIGFtIGluIHlvdSEiCg==",
             "networks": "auto",
-#            "host": "openstack-node-01",
-#            "hypervisor_hostname": "openstack-node-01"
             }
         }
 
-        #logic for creating instance in project with flavor and hive gpu
-        pass
+        #logic for creating instance in project with hive gpu
+
+        return self.create_server(**p)
+
 
     def reomve_instance(conn, params):
         pass

@@ -53,6 +53,15 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS instances(
     
 conn.commit()
 
+cursor.execute("""CREATE TABLE IF NOT EXISTS os_images(
+    id INTEGER PRIMARY KEY,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    openstack_uuid TEXT,
+    openstack_name TEXT,
+    billing_name TEXT);""")
+    
+conn.commit()
+
 params['request_id'] = str(uuid.uuid1())
 
 if params['commandfile'] =='open':

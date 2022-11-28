@@ -41,12 +41,31 @@ class VMDaemon(Daemon):
                 """, [params[3], params[1]])
         return None
 
+    def check_image_by_name(self, name):
+        os_id = self.cur.execute("SELECT openstack_id from os_images WHERE billing_name=(?)", name).fetchone()
+        if not os_id and self.cur.execute("SELECT COUNT(1) from os_images").fetchone() = 0:
+            helper = oops_helper()
+            for i in helper.list_images():
+                c += 1
+                self.cur.execute("""
+                INSERT INTO os_images (openstack_uuid, openstack_name, billing_name) VALUES (?, ?, ?);
+                """, [i[0], i[1], "bill_name_{0}".format(c)])
+                os_id = i[0]
+        elif not os_id:
+            return None
+        return os_id
+
     def ident_comand (self,command, params):
         helper = oops_helper()
         if command == "open":
+            os_image_id = self.check_image_by_name(params.get('ostmpl'))
+            if not os_image_id:
+                return "Error: OS image not found"
+
             user_id, username, email = helper.product_id_to_username(params.get('user'))
 
             project_name = '{0}_project'.format(username)
+            instance_name = '{0}_{1}'.format(username, params.get('user'))
 
             user_params = [user_id, username, project_name, email]
             self.insert_or_update_user(user_params)
@@ -85,8 +104,11 @@ class VMDaemon(Daemon):
 
 
             instance_params = {
-                "os": params.get('ostempl'),
-                "flavor": flavor,
+                "os_image_id": os_image_id,
+                "flavor_id": flavor.id,
+                "password": params.get("password"),
+                "instance_name": instance_name,
+                "meta_name": params.get("user"),
             }
             helper.create_instance(project, instance_params)
 
