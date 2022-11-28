@@ -89,7 +89,7 @@ class VMDaemon(Daemon):
 
             flavor_id = uuid.uuid1()
             flavor_params = {
-                "name": "{0}_flavor_{1}".format(project_name, flavor_id)
+                "name": "{0}_flavor_{1}".format(project_name, flavor_id),
                 "ram":params.get('ram', None),
                 "disk":params.get('disk', None),
                 "vcpus":params.get('vcpus', None),
@@ -110,7 +110,8 @@ class VMDaemon(Daemon):
                 "instance_name": instance_name,
                 "meta_name": params.get("user"),
             }
-            helper.create_instance(project, instance_params)
+            instance = helper.create_instance(project, instance_params)
+            print(instance)
 
 
 
