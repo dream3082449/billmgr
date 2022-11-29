@@ -40,7 +40,7 @@ class VMDaemon(Daemon):
             self.cur.execute("""
                 UPDATE users set email=%s where username=%s
                 """, [params[3], params[1]])
-        self.cur.commit()
+        self.conn.commit()
         return None
 
     def check_image_by_name(self, name):
@@ -54,7 +54,7 @@ class VMDaemon(Daemon):
                 INSERT INTO os_images (openstack_uuid, openstack_name, billing_name) VALUES (?, ?, ?);
                 """, [i[0], i[1], "bill_name_{0}".format(c)])
                 os_id = i[0]
-            self.cur.commit()
+            self.conn.commit()
         elif not os_id:
             return None
         return os_id
@@ -104,7 +104,7 @@ class VMDaemon(Daemon):
             self.cur.execute("""
                 INSERT INTO flavors (project_id, flavor_id) VALUES (?, ?); 
             """, [project.get('id'), flavor.get('id')])
-
+            self.conn.commit()
 
 
             instance_params = {
