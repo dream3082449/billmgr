@@ -43,7 +43,7 @@ class VMDaemon(Daemon):
         return None
 
     def check_image_by_name(self, name):
-        os_id = self.cur.execute("SELECT openstack_uuid from os_images WHERE billing_name=(?)", name).fetchone()
+        os_id = self.cur.execute("SELECT openstack_uuid from os_images WHERE billing_name = ?", (name)).fetchone()
         if not os_id and self.cur.execute("SELECT COUNT(1) from os_images").fetchone() == 0:
             helper = oops_helper()
             for i in helper.list_images():
