@@ -100,7 +100,7 @@ class oops_helper(object):
         pass
 
     def list_images(self):
-        return [(i.id, i.name, i.created_at) for i in sorted(conn.list_images(), key=lambda d:d['created_at'])]
+        return [(i.id, i.name, i.created_at) for i in sorted(self.conn.list_images(), key=lambda d:d['created_at'])]
 
     def create_instance(self, params):
         p = {"server" : {
