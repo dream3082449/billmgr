@@ -66,7 +66,7 @@ class VMDaemon(Daemon):
     def ident_comand (self,command, params):
         helper = oops_helper()
         if command == "open":
-            os_image_id = self.check_image_by_name(params.get('ostmpl'))
+            os_image_id = self.check_image_by_name(params.get('ostempl'))
             if not os_image_id:
                 return "Error: OS image not found"
 
