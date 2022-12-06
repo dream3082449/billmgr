@@ -9,7 +9,7 @@ openstack.enable_logging(True, stream=sys.stdout)
 class oops_helper(object):
 
     mysql_params = {
-        "host": "10.10.84.186",
+        "host": "10.8.12.186",
         "port": 3306,
         "user": "os_user",
         "passwd": "dtpe,kbq",
