@@ -75,9 +75,11 @@ class VMDaemon(Daemon):
             instance_name = '{0}_{1}'.format(username, product_id)
 
             user_params = [user_id, username, project_name, email]
-            user = self.insert_or_update_user(user_params)
 
             project = helper.get_or_create_project(project_name=project_name)
+
+            #save to local DB
+            self.insert_or_update_user(user_params) 
 
             attrs = {'username':username,
                 'password':params.get('password'),
@@ -86,13 +88,12 @@ class VMDaemon(Daemon):
             user = helper.get_or_create_user(**attrs)
 
             quotas_dict = {
-                "cpu": params.get('cpu', None),
-               #"hdd": params.get('hdd', None),
+                "cores": params.get('cpu', None),
+                "hdd": params.get('hdd', None),
                 "ram": params.get('ram', None),
-                "instance": params.get('instance', None)
             }
 
-            helper.update_project_quotes(project, quotas_dict)
+            helper.update_project_quotas(project, quotas_dict)
 
             flavor_id = uuid.uuid1()
             flavor_params = {

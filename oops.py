@@ -64,19 +64,19 @@ class oops_helper(object):
             }
             return self.conn.create_project(**attrs)
 
-    def update_project_quotes(self, project, params):
+    def update_project_quotas(self, project, params):
         project_id = project.get('id')
         current_quotas = self.conn.get_compute_quotas(project_id)
 
-        if current_quotas.get('instances') < params.get('instance'):
-            instances = params.get('instance')
+        if current_quotas.get('instances') < 1:
+            instances = 1
         else:
-            instances = current_quotas.get('instances') + params.get('instance')
+            instances = current_quotas.get('instances') + 1
 
-        if current_quotas.get('cores') < params.get('cpu'):
-            cores = params.get('instance')
+        if current_quotas.get('cores') < params.get('cores'):
+            cores = params.get('cores')
         else:
-            cores = current_quotas.get('cores') + params.get('cpu')
+            cores = current_quotas.get('cores') + params.get('cores')
 
         new_ram = params.get('ram') * 1024 # bump Gigabytes to megabytes for OpenStack cli
 
