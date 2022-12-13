@@ -69,14 +69,13 @@ class VMDaemon(Daemon):
             os_image_id = self.check_image_by_name(params.get('ostempl'))
             if not os_image_id:
                 return "Error: OS image not found"
-
-            user_id, username, email = helper.product_id_to_username(params.get('user'))
+            product_id = params.get('user').strip('user')
+            user_id, username, email = helper.product_id_to_username(product_id)
 
             project_name = '{0}_project'.format(username)
-            instance_name = '{0}_{1}'.format(username, params.get('user'))
+            instance_name = '{0}_{1}'.format(username, product_id)
 
             user_params = [user_id, username, project_name, email]
-            self.insert_or_update_user(user_params)
 
             project = helper.get_or_create_project(project_name=project_name)
 
