@@ -59,7 +59,6 @@ class oops_helper(object):
             return resp
         else:
             attrs = {
-            'is_enabled': True,
             'name': project_name
             }
             return self.conn.create_project(**attrs)
