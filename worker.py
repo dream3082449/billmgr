@@ -29,9 +29,8 @@ class VMDaemon(Daemon):
         return c
 
     def insert_or_update_user(self, params):
-        c = self.cur.execute("""
-            SELECT id from users where username=%s
-            """, [params.get('username')]).fetchall()
+        ### params = [user_id, username, project_name, email]
+        c = self.cur.execute("SELECT id from users where username=%s", [params[1]]).fetchall()
         if not c:
             self.cur.execute("""
                 INSERT INTO users (id, username, project, email) VALUES (?, ?, ?, ?);
