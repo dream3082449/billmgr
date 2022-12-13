@@ -59,6 +59,7 @@ class oops_helper(object):
             return resp
         else:
             attrs = {
+            'domain_id':'default',
             'name': project_name
             }
             return self.conn.create_project(**attrs)

@@ -76,6 +76,7 @@ class VMDaemon(Daemon):
             instance_name = '{0}_{1}'.format(username, product_id)
 
             user_params = [user_id, username, project_name, email]
+            user = self.insert_or_update_user(user_params)
 
             project = helper.get_or_create_project(project_name=project_name)
 
