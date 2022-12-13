@@ -53,7 +53,7 @@ class oops_helper(object):
             return self.conn.identity.create_user(**attrs)
 
 
-    def get_or_create_project(conn, project_name):
+    def get_or_create_project(self, project_name):
         resp = self.conn.identity.find_project(project_name)
         if resp:
             return resp
