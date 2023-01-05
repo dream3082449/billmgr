@@ -105,22 +105,21 @@ class oops_helper(object):
         return [(i.id, i.name, i.created_at) for i in sorted(self.conn.list_images(), key=lambda d:d['created_at'])]
 
     def create_instance(self, project, params):
-        p = {"server": {
-            "name": params.get("instance_name"),
-            "imageRef": params.get("os_image_id"),
-            "flavorRef": params.get("flavor_id"),
-            "OS-DCF:diskConfig": "AUTO",
-            "adminPass": params.get("password"),
+        p = {"name": params.get("instance_name"),
+            "image_id": params.get("os_image_id"),
+            "flavor_id": params.get("flavor_id"),
+            "disk_config": "AUTO",
+            "admin_password": params.get("password"),
             "metadata": {
                 "Server_Name" : params.get("meta_name"),
             },
             "networks": "auto",
             }
-        }
+        
 
         #logic for creating instance in project with hive gpu
         print(p)
-        return self.conn.create_server(**p)
+        return self.conn.compute.create_server(**p)
 
 
     def remove_instance(conn, params):
