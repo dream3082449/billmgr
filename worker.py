@@ -95,6 +95,8 @@ class VMDaemon(Daemon):
 
             helper.update_project_quotas(project, quotas_dict)
 
+            #create volume
+
             flavor_id = uuid.uuid1()
             flavor_params = {
                 "name": "{0}_flavor_{1}".format(project_name, flavor_id),

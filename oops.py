@@ -68,22 +68,22 @@ class oops_helper(object):
         project_id = project.get('id')
         current_quotas = self.conn.get_compute_quotas(project_id)
 
-        if current_quotas.get('instances') < 1:
+        if current_quotas.get('instances', 0) < 1:
             instances = 1
         else:
-            instances = current_quotas.get('instances') + 1
+            instances = current_quotas.get('instances', 0) + 1
 
-        if current_quotas.get('cores') < params.get('cores'):
+        if current_quotas.get('cores', 0) < params.get('cores'):
             cores = params.get('cores')
         else:
-            cores = current_quotas.get('cores') + params.get('cores')
+            cores = current_quotas.get('cores', 0) + params.get('cores')
 
         new_ram = params.get('ram') * 1024 # bump Gigabytes to megabytes for OpenStack cli
 
-        if current_quotas.get('ram') < new_ram:
+        if current_quotas.get('ram', 0) < new_ram:
             ram = new_ram
         else:
-            ram = current_quotas.get('ram') + new_ram
+            ram = current_quotas.get('ram', 0) + new_ram
 
         p = {
             "cores": cores,
