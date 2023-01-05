@@ -95,7 +95,7 @@ class oops_helper(object):
 
     def create_flavor(self, project, params):
         flavor = self.conn.create_flavor(**params)
-        conn.add_flavor_access(flavor.get('id'), project.get('id'))
+        self.conn.add_flavor_access(flavor.get('id'), project.get('id'))
         return flavor
 
     def get_free_hive_gpu(conn):
