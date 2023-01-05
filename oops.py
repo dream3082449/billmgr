@@ -118,7 +118,6 @@ class oops_helper(object):
         
 
         #logic for creating instance in project with hive gpu
-        print(p)
         return self.conn.compute.create_server(**p)
 
 
