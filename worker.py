@@ -119,6 +119,7 @@ class VMDaemon(Daemon):
                 "password": params.get("password"),
                 "instance_name": instance_name,
                 "meta_name": params.get("user"),
+                'user_id': user_id
             }
             instance = helper.create_instance(project, instance_params)
             print(instance)
