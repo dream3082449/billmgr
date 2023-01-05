@@ -106,11 +106,14 @@ class oops_helper(object):
 
     def create_instance(self, project, params):
         p = {
-            "adminPass": params.get("password"),
+            'project': project,
+            "admin_password": params.get("password"),
             "name" : params.get("instance_name"),
-            "imageRef" : params.get("os_image_id"),
-            "flavorRef" : params.get("flavor_id"),
-            "OS-DCF:diskConfig": "AUTO",
+            "instance_name" : params.get("meta_name"),
+            "image_id" : params.get("os_image_id"),
+            "flavor_id" : params.get("flavor_id"),
+            "disk_config": "AUTO",
+            'user_id': params.get('user_id'),
             }
         
 
