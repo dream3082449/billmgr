@@ -120,12 +120,12 @@ class oops_helper(object):
 
         #logic for creating instance in project with hive gpu
 
-        return self.create_server(**p)
+        return self.conn.create_server(**p)
 
 
-    def reomve_instance(conn, params):
+    def remove_instance(conn, params):
         pass
 
-    def change_flavor(conn, params):
+    def remove_flavor(conn, params):
         pass
 
