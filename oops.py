@@ -106,7 +106,6 @@ class oops_helper(object):
 
     def create_instance(self, project, params):
         p = {
-            'project': project,
             "adminPass": params.get("password"),
             "name" : params.get("instance_name"),
             "imageRef" : params.get("os_image_id"),
