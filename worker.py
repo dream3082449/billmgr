@@ -159,8 +159,8 @@ class VMDaemon(Daemon):
                     #do something
                     command, params = self.parse_data(data)
                     output.write(f"%s %s" % (command, json.dumps(params)))
-                    res = self.ident_comand(command, params)
-                    output.write(res)
+#                    res = self.ident_comand(command, params)
+#                    output.write(res)
 
             else:
                 time.sleep(10)
