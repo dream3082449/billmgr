@@ -88,9 +88,9 @@ class VMDaemon(Daemon):
             user = helper.get_or_create_user(**attrs)
 
             quotas_dict = {
-                "cores": params.get('cpu', None),
-                "hdd": params.get('hdd', None),
-                "ram": params.get('ram', None),
+                "cores": int(params.get('cpu', 0)),
+                "hdd": int(params.get('hdd', 0)),
+                "ram": int(params.get('ram', 0)),
             }
 
             helper.update_project_quotas(project, quotas_dict)
@@ -100,9 +100,9 @@ class VMDaemon(Daemon):
             flavor_id = uuid.uuid1()
             flavor_params = {
                 "name": "{0}_flavor_{1}".format(project_name, flavor_id),
-                "ram":params.get('ram', None),
-                "disk":params.get('disk', None),
-                "vcpus":params.get('vcpus', None),
+                "ram": int(params.get('ram', 0)),
+                "disk": int(params.get('disk', 0)),
+                "vcpus": int(params.get('vcpus', 0)),
                 "is_public": False,
             }
 
