@@ -104,7 +104,7 @@ class oops_helper(object):
     def list_images(self):
         return [(i.id, i.name, i.created_at) for i in sorted(self.conn.list_images(), key=lambda d:d['created_at'])]
 
-    def create_instance(self, params):
+    def create_instance(self, project, params):
         p = {"server" : {
             "adminPass": params.get("password"),
             "name" : params.get("instance_name"),
