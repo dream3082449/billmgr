@@ -143,7 +143,7 @@ class VMDaemon(Daemon):
         return 'Huy 22'
 
     def prepare_data(self, data):
-        raise data
+        raise Exception(data)
         r = json.loads(data[0][0])
         c = r.pop('commandfile')
         return (c, r)
