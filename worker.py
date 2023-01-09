@@ -24,7 +24,7 @@ class VMDaemon(Daemon):
 
     def get_queue(self):
         c = self.cur.execute("""
-            SELECT params from queue where is_done=false and on_process=false order by created ASC LIMIT 1
+            SELECT id, params from queue where is_done=false and on_process=false order by created ASC LIMIT 1
             """).fetchall()
         return c
 
