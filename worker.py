@@ -95,8 +95,6 @@ class VMDaemon(Daemon):
 
             helper.update_project_quotas(project, quotas_dict)
 
-            #create volume
-
             flavor_id = uuid.uuid1()
             flavor_params = {
                 "name": "{0}_flavor_{1}".format(project_name, flavor_id),
@@ -144,7 +142,8 @@ class VMDaemon(Daemon):
 
         return 'Huy 22'
 
-    def parse_data(self, data):
+    def prepare_data(self, data):
+        raise data
         r = json.loads(data[0][0])
         c = r.pop('commandfile')
         return (c, r)
@@ -158,7 +157,7 @@ class VMDaemon(Daemon):
             if data:
                 for row in data:
                     #do something
-                    command, params = self.parse_data(data)
+                    command, params = self.prepare_data(data)
                     output.write(f"%s %s" % (command, json.dumps(params)))
                     res = self.ident_comand(command, params)
                     output.write(res)
