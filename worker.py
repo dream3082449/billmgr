@@ -22,10 +22,10 @@ class VMDaemon(Daemon):
     conn = sqlite3.connect(DBNAME)
     cur = conn.cursor()
 
-    def get_queue(self):
+    def get_queue(self, on_process=False):
         c = self.cur.execute("""
-            SELECT id, params from queue where is_done=false and on_process=false order by created ASC LIMIT 1
-            """).fetchall()
+            SELECT id, params from queue where is_done=false and on_process=? order by created ASC LIMIT 1
+            """, [on_process,]).fetchall()
         return c
 
     def insert_or_update_user(self, params):
@@ -62,7 +62,7 @@ class VMDaemon(Daemon):
             return None
         return os_id
 
-    def ident_comand (self,command, params):
+    def ident_command (self,command, params):
         helper = oops_helper()
         if command == "open":
             os_image_id = self.check_image_by_name(params.get('ostempl'))
@@ -120,8 +120,12 @@ class VMDaemon(Daemon):
                 'user_id': user_id
             }
             instance = helper.create_instance(project, instance_params)
-            print(instance)
 
+            self.cur.execute("""
+                INSERT INTO instances (user_id, openstack_uuid, project, params)
+            """, [user_id, instance.get('id'), project.get('id'), instance])
+
+            return instance
 
 
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
@@ -140,30 +144,47 @@ class VMDaemon(Daemon):
             print(command)
 #            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 5)""")
 
-        return 'Huy 22'
+        return 'Command does not exist'
 
-    def prepare_data(self, data):
-        raise Exception(data)
-        r = json.loads(data[0][0])
+    def check_command_readiness(self, rid, command, params):
+        if command == "open":
+            pass
+        elif command == "close":
+            pass
+        elif command == "resume":
+            pass
+        elif command == "setparam":
+            pass
+        elif command == "suspend":
+            pass
+        return False
+
+    def prepare_data(self, data, set_on_process=False):
+        rid = data[0][0]
+        if set_on_process:
+            self.cur.execute("UPDATE queue SET on_process=1 where id=?", [rid])
+        r = json.loads(data[0][1])
         c = r.pop('commandfile')
-        return (c, r)
+        return (rid, c, r)
 
     def run(self):
         time.sleep(0.3)
         output = open(LOGFILE, 'w')
         #TODO
         while True:
-            data = self.get_queue()
-            if data:
-                for row in data:
-                    #do something
-                    command, params = self.prepare_data(data)
-                    output.write(f"%s %s" % (command, json.dumps(params)))
-                    res = self.ident_comand(command, params)
-                    output.write(res)
+            for row in self.get_queue():
+                #do something
+                rid, command, params = self.prepare_data(data, set_on_process=True)
+                output.write(f"%s %s" % (command, json.dumps(params)))
+                res = self.ident_command(command, params)
+                output.write(res)
 
-            else:
-                time.sleep(10)
+            for row in self.get_queue(on_process=True):
+                rid, command, params = self.prepare_data(data, set_on_process=False)
+                output.write(f"%s %s" % (command, json.dumps(params)))
+                res = self.check_command_readiness(rid, command, params)
+                output.write(res)
+
             #FOR DEBUG
             time.sleep(5)
 
