@@ -157,7 +157,7 @@ class VMDaemon(Daemon):
             pass
         elif command == "suspend":
             pass
-        return False
+        return 'Command not exists on readiness'
 
     def prepare_data(self, data, set_on_process=False):
         rid = data[0]
