@@ -124,7 +124,7 @@ class VMDaemon(Daemon):
             j_instance = json.dumps(instance)
             self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
             self.cur.execute("""
-                INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?))
+                INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             """, [user_id, instance.get('id'), project.get('id'), j_instance])
 
             return instance
