@@ -213,10 +213,6 @@ class VMDaemon(Daemon):
             time.sleep(5)
 
 
-        output.write('finished')
-        output.close()
-
-
 def control_daemon(action):
     os.system(" ".join((sys.executable, __file__, action)))
 
