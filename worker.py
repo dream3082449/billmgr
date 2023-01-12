@@ -122,6 +122,9 @@ class VMDaemon(Daemon):
             ii = helper.create_instance(project, instance_params)
             instance = ii.to_dict()
             j_instance = json.dumps(instance)
+            if DEBUG:
+                print(rid)
+                print(j_instance)
             self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
