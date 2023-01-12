@@ -159,13 +159,14 @@ class VMDaemon(Daemon):
             pass
         return False
 
-    def prepare_data(self, data, on_process=False):
+    def prepare_data(self, data, set_on_process=False):
         rid = data[0]
-        if on_process:
+        if set_on_process:
             self.cur.execute("UPDATE queue SET on_process=1 where id=?", [str(rid)])
         r = json.loads(data[1])
         c = r.pop('commandfile')
-        return (rid, c, r)
+        result = data[2]
+        return (rid, c, r, result)
 
     def run(self):
         time.sleep(0.3)
@@ -174,13 +175,13 @@ class VMDaemon(Daemon):
         while True:
             for row in self.get_queue():
                 #do something
-                rid, command, params, _ = self.prepare_data(row, on_process=True)
+                rid, command, params, _ = self.prepare_data(row, set_on_process=True)
                 output.write(f"%s %s" % (command, json.dumps(params)))
                 res = self.ident_command(command, params)
                 output.write(res)
 
             for row in self.get_queue(on_process=True):
-                rid, command, params, result = self.prepare_data(row, on_process=False)
+                rid, command, params, result = self.prepare_data(row, set_on_process=False)
                 output.write(f"%s %s" % (command, json.dumps(params)))
                 res = self.check_command_readiness(rid, command, params, result)
                 output.write(res)
