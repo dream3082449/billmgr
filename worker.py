@@ -120,6 +120,7 @@ class VMDaemon(Daemon):
                 'user_id': user_id
             }
             ii = helper.create_instance(project, instance_params)
+            raise Exception(ii)
             instance = ii.pop('server')
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params)
