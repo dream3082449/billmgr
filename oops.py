@@ -126,7 +126,7 @@ class oops_helper(object):
             ## ACTIVE, BUILDING, DELETED, ERROR, HARD_REBOOT, PASSWORD, 
             ## PAUSED, REBOOT, REBUILD, RESCUED, RESIZED, REVERT_RESIZE, 
             ## SHUTOFF, SOFT_DELETED, STOPPED, SUSPENDED, UNKNOWN, or VERIFY_RESIZE
-            return instance.get('status')
+            return instance.get('status'), instance
         else:
             return None
 

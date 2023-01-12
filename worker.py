@@ -166,10 +166,12 @@ class VMDaemon(Daemon):
         if command == "open":
             res = json.loads(result)
             instance_id = res.get('id')
-            instance_status = self.helper.get_instance_status(instance_id)
+            instance_status, instance = self.helper.get_instance_status(instance_id)
             if instance_status == 'ACTIVE':
                 logging.info("Instance {0} is ACTIVE".format(instance_id))
-                self.cur.execute("UPDATE queue SET is_done=1, on_process=0 where id=?", [str(rid)])
+                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=? where id=?", 
+                        [json.loads(instance), str(rid)]
+                    )
                 self.conn.commit()
             else:
                 logging.warning("Instance {0} have status {1}".format(instance_id, instance_status))

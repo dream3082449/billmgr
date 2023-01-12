@@ -17,7 +17,7 @@ cursor = conn.cursor()
 
 while True:
 	data = cursor.execute(
-		"""SELECT result FROM queue WHERE request_id=(?) AND is_done=1;""",
+		"""SELECT result FROM queue WHERE request_id=(?) AND is_done=1 AND on_process=0;""",
 		[params['request_id']]
 		).fetchone()
 	conn.commit()
