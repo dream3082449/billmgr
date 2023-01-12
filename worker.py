@@ -174,13 +174,13 @@ class VMDaemon(Daemon):
         while True:
             for row in self.get_queue():
                 #do something
-                rid, command, params = self.prepare_data(data, set_on_process=True)
+                rid, command, params = self.prepare_data(row, set_on_process=True)
                 output.write(f"%s %s" % (command, json.dumps(params)))
                 res = self.ident_command(command, params)
                 output.write(res)
 
             for row in self.get_queue(on_process=True):
-                rid, command, params = self.prepare_data(data, set_on_process=False)
+                rid, command, params = self.prepare_data(row, set_on_process=False)
                 output.write(f"%s %s" % (command, json.dumps(params)))
                 res = self.check_command_readiness(rid, command, params)
                 output.write(res)
