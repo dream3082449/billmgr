@@ -160,10 +160,10 @@ class VMDaemon(Daemon):
         return False
 
     def prepare_data(self, data, set_on_process=False):
-        rid = data[0][0]
+        rid = data[0]
         if set_on_process:
-            self.cur.execute("UPDATE queue SET on_process=1 where id=?", [rid])
-        r = json.loads(data[0][1])
+            self.cur.execute("UPDATE queue SET on_process=1 where id=?", [str(rid)])
+        r = json.loads(data[1])
         c = r.pop('commandfile')
         return (rid, c, r)
 
