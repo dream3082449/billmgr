@@ -170,7 +170,7 @@ class VMDaemon(Daemon):
             if instance_status == 'ACTIVE':
                 logging.info("Instance {0} is ACTIVE".format(instance_id))
                 self.cur.execute("UPDATE queue SET is_done=1, on_process=0 where id=?", [str(rid)])
-                self.cur.commit()
+                self.conn.commit()
             else:
                 logging.warning("Instance {0} have status {1}".format(instance_id, instance_status))
             return None
