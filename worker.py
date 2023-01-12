@@ -24,7 +24,7 @@ class VMDaemon(Daemon):
 
     def get_queue(self, on_process=False):
         c = self.cur.execute("""
-            SELECT id, params from queue where is_done=false and on_process=? order by created ASC LIMIT 1
+            SELECT id, params, result from queue where is_done=false and on_process=? order by created ASC LIMIT 1
             """, [on_process,]).fetchall()
         return c
 
@@ -119,11 +119,11 @@ class VMDaemon(Daemon):
                 "meta_name": params.get("user"),
                 'user_id': user_id
             }
-            instance = helper.create_instance(project, instance_params)
-
+            ii = helper.create_instance(project, instance_params)
+            instance = ii.pop('server')
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params)
-            """, [user_id, instance.get('id'), project.get('id'), instance])
+            """, [user_id, instance.get('id'), project.get('id'), json.dumps(instance)])
 
             return instance
 
@@ -146,7 +146,7 @@ class VMDaemon(Daemon):
 
         return 'Command does not exist'
 
-    def check_command_readiness(self, rid, command, params):
+    def check_command_readiness(self, rid, command, params, result):
         if command == "open":
             pass
         elif command == "close":
@@ -159,9 +159,9 @@ class VMDaemon(Daemon):
             pass
         return False
 
-    def prepare_data(self, data, set_on_process=False):
+    def prepare_data(self, data, on_process=False):
         rid = data[0]
-        if set_on_process:
+        if on_process:
             self.cur.execute("UPDATE queue SET on_process=1 where id=?", [str(rid)])
         r = json.loads(data[1])
         c = r.pop('commandfile')
@@ -174,15 +174,15 @@ class VMDaemon(Daemon):
         while True:
             for row in self.get_queue():
                 #do something
-                rid, command, params = self.prepare_data(row, set_on_process=True)
+                rid, command, params, _ = self.prepare_data(row, on_process=True)
                 output.write(f"%s %s" % (command, json.dumps(params)))
                 res = self.ident_command(command, params)
                 output.write(res)
 
             for row in self.get_queue(on_process=True):
-                rid, command, params = self.prepare_data(row, set_on_process=False)
+                rid, command, params, result = self.prepare_data(row, on_process=False)
                 output.write(f"%s %s" % (command, json.dumps(params)))
-                res = self.check_command_readiness(rid, command, params)
+                res = self.check_command_readiness(rid, command, params, result)
                 output.write(res)
 
             #FOR DEBUG
