@@ -150,7 +150,7 @@ class VMDaemon(Daemon):
 
     def check_command_readiness(self, rid, command, params, result):
         if command == "open":
-            pass
+            print('HorsePower')
         elif command == "close":
             pass
         elif command == "resume":
