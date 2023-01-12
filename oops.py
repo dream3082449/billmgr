@@ -119,6 +119,16 @@ class oops_helper(object):
         #logic for creating instance in project with hive gpu
         return self.conn.compute.create_server(**p)
 
+    def get_instance_status(self, instance_id):
+        ii = self.conn.compute.find_server(instance_id)
+        if ii:
+            instance = ii.to_dict()
+            ## ACTIVE, BUILDING, DELETED, ERROR, HARD_REBOOT, PASSWORD, 
+            ## PAUSED, REBOOT, REBUILD, RESCUED, RESIZED, REVERT_RESIZE, 
+            ## SHUTOFF, SOFT_DELETED, STOPPED, SUSPENDED, UNKNOWN, or VERIFY_RESIZE
+            return instance.get('status')
+        else:
+            return None
 
     def remove_instance(conn, params):
         pass

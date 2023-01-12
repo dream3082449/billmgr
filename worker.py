@@ -3,14 +3,26 @@ import os, sys, time, json
 import unittest
 import sqlite3
 import uuid
+import logging
 
 from oops import oops_helper
 
 from daemon import Daemon
-PIDFILE = 'vmdaemon.pid'
-LOGFILE = 'vmdaemon.log'
+PIDFILE = './vmdaemon.pid'
+LOGFILE = './vmdaemon.log'
 DBNAME = 'queues.db'
 DEBUG=True
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+logging.basicConfig(
+    filename=LOGFILE,
+    filemode='a',
+    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+    datefmt='%H:%M:%S',
+    level=logging.DEBUG
+)
+logging.info("Run VMDaemon")
 
 class VMDaemon(Daemon):
 #    def __init__(self, *args, **kwargs):
@@ -21,6 +33,8 @@ class VMDaemon(Daemon):
 
     conn = sqlite3.connect(DBNAME)
     cur = conn.cursor()
+
+    helper = oops_helper()
 
     def get_queue(self, on_process=False):
         c = self.cur.execute("""
@@ -50,8 +64,7 @@ class VMDaemon(Daemon):
             os_id = o
         c = self.cur.execute("SELECT COUNT(1) from os_images").fetchone()[0]
         if not os_id and c == 0:
-            helper = oops_helper()
-            for i in helper.list_images():
+            for i in self.helper.list_images():
                 c += 1
                 self.cur.execute("""
                 INSERT INTO os_images (openstack_uuid, openstack_name, billing_name) VALUES (?, ?, ?);
@@ -63,20 +76,19 @@ class VMDaemon(Daemon):
         return os_id
 
     def ident_command (self, rid, command, params):
-        helper = oops_helper()
         if command == "open":
             os_image_id = self.check_image_by_name(params.get('ostempl'))
             if not os_image_id:
                 return "Error: OS image not found"
             product_id = params.get('user').strip('user')
-            user_id, username, email = helper.product_id_to_username(product_id)
+            user_id, username, email = self.helper.product_id_to_username(product_id)
 
             project_name = '{0}_project'.format(username)
             instance_name = '{0}_{1}'.format(username, product_id)
 
             user_params = [user_id, username, project_name, email]
 
-            project = helper.get_or_create_project(project_name=project_name)
+            project = self.helper.get_or_create_project(project_name=project_name)
 
             #save to local DB
             self.insert_or_update_user(user_params) 
@@ -85,7 +97,7 @@ class VMDaemon(Daemon):
                 'password':params.get('password'),
                 'project_id': project.get('id'),
                 'email':email}
-            user = helper.get_or_create_user(**attrs)
+            user = self.helper.get_or_create_user(**attrs)
 
             quotas_dict = {
                 "cores": int(params.get('cpu', 0)),
@@ -93,7 +105,7 @@ class VMDaemon(Daemon):
                 "ram": int(params.get('ram', 0)),
             }
 
-            helper.update_project_quotas(project, quotas_dict)
+            self.helper.update_project_quotas(project, quotas_dict)
 
             flavor_id = uuid.uuid1()
             flavor_params = {
@@ -104,7 +116,7 @@ class VMDaemon(Daemon):
                 "is_public": False,
             }
 
-            flavor = helper.create_flavor(project, flavor_params)
+            flavor = self.helper.create_flavor(project, flavor_params)
             self.cur.execute("""
                 INSERT INTO flavors (project_id, flavor_id) VALUES (?, ?); 
             """, [project.get('id'), flavor.get('id')])
@@ -119,12 +131,11 @@ class VMDaemon(Daemon):
                 "meta_name": params.get("user"),
                 'user_id': user_id
             }
-            ii = helper.create_instance(project, instance_params)
+            ii = self.helper.create_instance(project, instance_params)
             instance = ii.to_dict()
             j_instance = json.dumps(instance)
-            if DEBUG:
-                print(rid)
-                print(j_instance)
+            logging.info("Instance {0} is CREATED".format(instance.get('id')))
+
             self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
@@ -153,7 +164,17 @@ class VMDaemon(Daemon):
 
     def check_command_readiness(self, rid, command, params, result):
         if command == "open":
-            print(result)
+            res = json.loads(result)
+            instance_id = res.get('id')
+            instance_status = self.helper.get_instance_status(instance_id)
+            if instance_status = 'ACTIVE':
+                logging.info("Instance {0} is ACTIVE".format(instance_id))
+                self.cur.execute("UPDATE queue SET is_done=1, on_process=0 where id=?", [str(rid)])
+                self.cur.commit()
+            else:
+                logging.warning("Instance {0} have status {1}".format(instance_id, instance_status))
+            return None
+
         elif command == "close":
             pass
         elif command == "resume":
@@ -175,15 +196,12 @@ class VMDaemon(Daemon):
 
     def run(self):
         time.sleep(0.3)
-        output = open(LOGFILE, 'w')
-        #TODO
         while True:
             for row in self.get_queue():
-                #do something
                 rid, command, params, _ = self.prepare_data(row, set_on_process=True)
-                output.write(f"%s %s" % (command, json.dumps(params)))
+                logging.info(f"%s %s" % (command, json.dumps(params)))
                 res = self.ident_command(rid, command, params)
-                output.write(res)
+                logging.info("Command %s done." % (command))
 
             for row in self.get_queue(on_process=True):
                 rid, command, params, result = self.prepare_data(row, set_on_process=False)
