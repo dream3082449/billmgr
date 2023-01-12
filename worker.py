@@ -126,7 +126,7 @@ class VMDaemon(Daemon):
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             """, [user_id, instance.get('id'), project.get('id'), j_instance])
-
+            self.conn.commit()
             return j_instance
 
 
