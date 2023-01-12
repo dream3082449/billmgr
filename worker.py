@@ -62,7 +62,7 @@ class VMDaemon(Daemon):
             return None
         return os_id
 
-    def ident_command (self,command, params):
+    def ident_command (self, rid, command, params):
         helper = oops_helper()
         if command == "open":
             os_image_id = self.check_image_by_name(params.get('ostempl'))
@@ -121,9 +121,11 @@ class VMDaemon(Daemon):
             }
             ii = helper.create_instance(project, instance_params)
             instance = ii.to_dict()
+            j_instance = json.dumps(instance)
+            self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
             self.cur.execute("""
-                INSERT INTO instances (user_id, openstack_uuid, project, params)
-            """, [user_id, instance.get('id'), project.get('id'), json.dumps(instance)])
+                INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?))
+            """, [user_id, instance.get('id'), project.get('id'), j_instance])
 
             return instance
 
@@ -177,7 +179,7 @@ class VMDaemon(Daemon):
                 #do something
                 rid, command, params, _ = self.prepare_data(row, set_on_process=True)
                 output.write(f"%s %s" % (command, json.dumps(params)))
-                res = self.ident_command(command, params)
+                res = self.ident_command(rid, command, params)
                 output.write(res)
 
             for row in self.get_queue(on_process=True):
