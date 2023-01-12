@@ -127,7 +127,7 @@ class VMDaemon(Daemon):
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             """, [user_id, instance.get('id'), project.get('id'), j_instance])
 
-            return instance
+            return j_instance
 
 
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
