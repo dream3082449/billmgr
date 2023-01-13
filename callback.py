@@ -24,7 +24,7 @@ while True:
 	if data:
 		print(data[0])
 		break
-	time.sleep(10)
+	time.sleep(5)
 
 
 

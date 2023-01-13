@@ -135,8 +135,13 @@ class VMDaemon(Daemon):
             instance = ii.to_dict()
             j_instance = json.dumps(instance)
             logging.info("Instance {0} is CREATED".format(instance.get('id')))
+            response_for_bill = "--username={0} --password={1} --ip-addr={2}".format(
+                params.get('user'),
+                instalce.get('admin_password'),
+                instalce.addresses.get('provider')[0].get('addr')
+                )
 
-            self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
+            self.cur.execute("UPDATE queue SET result=? WHERE id=?", [response_for_bill, rid])
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             """, [user_id, instance.get('id'), project.get('id'), j_instance])
