@@ -122,7 +122,6 @@ class VMDaemon(Daemon):
             """, [project.get('id'), flavor.get('id')])
             self.conn.commit()
 
-
             instance_params = {
                 "os_image_id": os_image_id,
                 "flavor_id": flavor.id,
@@ -132,9 +131,11 @@ class VMDaemon(Daemon):
                 'user_id': user_id
             }
             ii = self.helper.create_instance(project, instance_params)
+            logging.info("Instance {0} is CREATED".format(instance.get('id')))
+
             instance = ii.to_dict()
             j_instance = json.dumps(instance)
-            logging.info("Instance {0} is CREATED".format(instance.get('id')))
+
             response_for_bill = "--username={0} --password={1} --ip-addr={2}".format(
                 params.get('user'),
                 instalce.get('admin_password'),
