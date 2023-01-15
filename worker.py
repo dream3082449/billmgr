@@ -167,6 +167,11 @@ class VMDaemon(Daemon):
     def check_command_readiness(self, rid, command, params, result):
         if command == "open":
             res = json.loads(result)
+            if not res:
+                logging.error('Error on request_id=  : no result found. restart task'.format(params.get('request_id')))
+                self.cur.execute("UPDATE queue SET on_process=0 WHERE id=?", [rid,])
+                self.conn.commit()
+                return None
             instance_id = res.get('id')
             instance_status, instance = self.helper.get_instance_status(instance_id)
             if instance_status == 'ACTIVE':
