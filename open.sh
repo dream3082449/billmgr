@@ -1,9 +1,12 @@
 #!/bin/bash
-if not $i:
-	echo "parameter not found"
-	exit 0
+
+if [ $# -eq 0 ]; then
+    >&2 echo "No arguments provided"
+    exit 1
 fi
+
 s_args=''
+
 for i
 do
 	s_args+=" $i"
