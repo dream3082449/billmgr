@@ -1,4 +1,8 @@
 #!/bin/bash
+if not $i:
+	echo "parameter not found"
+	exit 0
+fi
 s_args=''
 for i
 do
@@ -6,8 +10,6 @@ do
 done
 cd /opt/billmgr
 resp=`python3 wrapper.py commandfile=open $s_args`
-#IFS=' '
-read -a strarr <<< $resp
+#read -a strarr <<< $resp
 r=`python3 callback.py --request_id=${strarr[0]}`
-#r=1243
 echo "OK $r"
