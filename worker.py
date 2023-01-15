@@ -178,6 +178,9 @@ class VMDaemon(Daemon):
                 self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=? where id=?", 
                         [json.loads(instance), str(rid)]
                     )
+                self.cur.execute("""
+                        UPDATE instances SET params=? WHERE openstack_uuid=?) VALUES (?, ?)
+                    """, [json.dumps(instance), instance.get('id')])
                 self.conn.commit()
             else:
                 logging.warning("Instance {0} have status {1}".format(instance_id, instance_status))
