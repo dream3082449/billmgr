@@ -138,13 +138,7 @@ class VMDaemon(Daemon):
             logging.info("Instance {0} is CREATED".format(instance.get('id')))
 
 
-            response_for_bill = "--username={0} --password={1} --ip-addr={2}".format(
-                params.get('user'),
-                instance.get('admin_password'),
-                instance['addresses']['provider'][0]['addr']
-                )
-
-            self.cur.execute("UPDATE queue SET result=?, response=? WHERE id=?", [j_instancem, response_for_bill, rid])
+            self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instancem, rid])
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             """, [user_id, instance.get('id'), project.get('id'), j_instance])
@@ -177,8 +171,14 @@ class VMDaemon(Daemon):
             instance_status, instance = self.helper.get_instance_status(instance_id)
             if instance_status == 'ACTIVE':
                 logging.info("Instance {0} is ACTIVE".format(instance_id))
-                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=? where id=?", 
-                        [json.loads(instance), str(rid)]
+
+                response_for_bill = "--username={0} --password={1} --ip-addr={2}".format(
+                    params.get('user'),
+                    params.get('password'),
+                    instance['addresses']['provider'][0]['addr']
+                )
+                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? where id=?", 
+                        [json.loads(instance), response_for_bill, str(rid)]
                     )
                 self.cur.execute("""
                         UPDATE instances SET params=? WHERE openstack_uuid=?) VALUES (?, ?)
@@ -204,7 +204,7 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET on_process=1 where id=?", [str(rid)])
         r = json.loads(data[1])
         c = r.pop('commandfile')
-        result = data[2] if data[2] else str()
+        result = data[2] if data[2] else '{}'
         return (rid, c, r, result)
 
     def run(self):
@@ -217,8 +217,9 @@ class VMDaemon(Daemon):
                 logging.info("Command %s with params %s on process." % (command, json.dumps(params)))
 
             for row in self.get_queue(on_process=True):
-                rid, command, params, result = self.prepare_data(row)
-                logging.info(f"%s %s" % (command, json.dumps(params)))
+                rid, command, p, result = self.prepare_data(row)
+                params = json.dumps(p)
+                logging.info(f"%s %s" % (command, p))
                 res = self.check_command_readiness(rid, command, params, result)
                 logging.info("Command %s is DONE with result %s" % (command, result))
 
