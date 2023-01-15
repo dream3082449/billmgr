@@ -204,7 +204,7 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET on_process=1 where id=?", [str(rid)])
         r = json.loads(data[1])
         c = r.pop('commandfile')
-        result = data[2]
+        result = data[2] if data[2] else str()
         return (rid, c, r, result)
 
     def run(self):
@@ -217,7 +217,7 @@ class VMDaemon(Daemon):
                 logging.info("Command %s with params %s on process." % (command, json.dumps(params)))
 
             for row in self.get_queue(on_process=True):
-                rid, command, params, result = self.prepare_data(row, set_on_process=False)
+                rid, command, params, result = self.prepare_data(row)
                 logging.info(f"%s %s" % (command, json.dumps(params)))
                 res = self.check_command_readiness(rid, command, params, result)
                 logging.info("Command %s is DONE with result %s" % (command, result))
