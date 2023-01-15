@@ -22,7 +22,8 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS queue(
     on_process INTEGER DEFAULT 0,
     is_done INTEGER DEFAULT 0,
     params TEXT,
-    result TEXT);""")
+    result TEXT,
+    response TEXT);""")
 conn.commit()
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS users(

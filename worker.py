@@ -138,11 +138,11 @@ class VMDaemon(Daemon):
 
             response_for_bill = "--username={0} --password={1} --ip-addr={2}".format(
                 params.get('user'),
-                instalce.get('admin_password'),
-                instalce.addresses.get('provider')[0].get('addr')
+                instance.get('admin_password'),
+                instance.addresses.get('provider')[0].get('addr')
                 )
 
-            self.cur.execute("UPDATE queue SET result=? WHERE id=?", [response_for_bill, rid])
+            self.cur.execute("UPDATE queue SET result=?, response=? WHERE id=?", [j_instancem, response_for_bill, rid])
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             """, [user_id, instance.get('id'), project.get('id'), j_instance])
