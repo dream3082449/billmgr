@@ -218,7 +218,7 @@ class VMDaemon(Daemon):
 
             for row in self.get_queue(on_process=True):
                 rid, command, p, result = self.prepare_data(row)
-                params = json.dumps(p)
+                params = json.loads(p)
                 logging.info(f"%s %s" % (command, p))
                 res = self.check_command_readiness(rid, command, params, result)
                 logging.info("Command %s is DONE with result %s" % (command, result))
