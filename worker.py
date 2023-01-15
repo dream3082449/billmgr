@@ -141,7 +141,7 @@ class VMDaemon(Daemon):
             response_for_bill = "--username={0} --password={1} --ip-addr={2}".format(
                 params.get('user'),
                 instance.get('admin_password'),
-                instance.addresses.get('provider')[0].get('addr')
+                instance['addresses']['provider'][0]['addr']
                 )
 
             self.cur.execute("UPDATE queue SET result=?, response=? WHERE id=?", [j_instancem, response_for_bill, rid])
