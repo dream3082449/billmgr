@@ -178,7 +178,7 @@ class VMDaemon(Daemon):
                     instance['addresses']['provider'][0]['addr']
                 )
                 self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? where id=?", 
-                        [json.loads(instance), response_for_bill, str(rid)]
+                        [json.dumps(instance), response_for_bill, str(rid)]
                     )
                 self.cur.execute("""
                         UPDATE instances SET params=? WHERE openstack_uuid=?) VALUES (?, ?)
