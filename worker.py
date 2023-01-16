@@ -79,7 +79,8 @@ class VMDaemon(Daemon):
         if command == "open":
             os_image_id = self.check_image_by_name(params.get('ostempl'))
             if not os_image_id:
-                return "Error: OS image not found"
+                logging.error("OS image not found for Instance {0} is ".format(params.get('user')))
+                return None
             product_id = params.get('user').strip('user')
             user_id, username, email = self.helper.product_id_to_username(product_id)
 
@@ -208,11 +209,12 @@ class VMDaemon(Daemon):
             if instance_status == 'ACTIVE':
                 logging.info("Instance {0} is ACTIVE".format(instance_id))
 
-                response_for_bill = "OK --id={0} --username={1} --password={2} --ip-addr={3}".format(
+                response_for_bill = "OK --id={0} --username={1} --password={2} --ip-addr={3} --server_login={4}".format(
                     params.get('user'),
-                    'root',
+                    params.get('user'),
                     params.get('password'),
-                    instance['addresses']['provider'][0]['addr']
+                    instance['addresses']['provider'][0]['addr'],
+                    'root'
                 )
                 self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
                         [json.dumps(instance), response_for_bill, rid]
