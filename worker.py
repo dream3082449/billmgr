@@ -174,8 +174,8 @@ class VMDaemon(Daemon):
             data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
             if data:
                 i_status, _ = self.helper.get_instance_status(data[0])
-                if i_status != 'PAUSED':
-                    logging.warning("The instance status for product_id {0} is not 'PAUSED' , so it cannot resumed".format(params.get('user')))
+                if i_status != 'SUSPENDED':
+                    logging.warning("The instance status for product_id {0} is not 'SUSPENDED' , so it cannot resumed".format(params.get('user')))
                     return None
                 self.helper.suspend_instance(data[0])
                 logging.info("Instance {0} resumed".format(data[0]))
