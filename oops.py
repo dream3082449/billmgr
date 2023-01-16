@@ -130,9 +130,8 @@ class oops_helper(object):
         else:
             return None
 
-    def remove_instance(conn, params):
-        pass
+    def remove_instance(self, instance_id):
+        self.conn.compute.delete_server(instance_id)
+        return True
 
-    def remove_flavor(conn, params):
-        pass
 

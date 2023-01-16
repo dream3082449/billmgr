@@ -141,14 +141,13 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
-            """, [user_id, instance.get('id'), project.get('id'), j_instance])
+            """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
             self.conn.commit()
             return j_instance
 
 
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
-#            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 1)""")
         elif command == "close":
             print(command)
 #            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 2)""")
@@ -164,11 +163,16 @@ class VMDaemon(Daemon):
 
         return 'Command does not exist'
 
+    def delete_instance(self, instance_id):
+        self.helper.remove_instance(instance_id)
+        logging.warning("Instance {0} was DELETED".format(instance_id))
+        return True
+
     def check_command_readiness(self, rid, command, params, result):
         if command == "open":
             res = json.loads(result)
             if not res:
-                logging.error('Error on request_id=  : no result found. restart task'.format(params.get('request_id')))
+                logging.error('Error on request_id={0} : no result found. restart task'.format(params.get('request_id')))
                 self.cur.execute("UPDATE queue SET on_process=0 WHERE id=?", [rid,])
                 self.conn.commit()
                 return None
@@ -177,7 +181,7 @@ class VMDaemon(Daemon):
             if instance_status == 'ACTIVE':
                 logging.info("Instance {0} is ACTIVE".format(instance_id))
 
-                response_for_bill = "--username={0} --password={1} --ip-addr={2}".format(
+                response_for_bill = "OK --username={0} --password={1} --ip-addr={2}".format(
                     params.get('user'),
                     params.get('password'),
                     instance['addresses']['provider'][0]['addr']
@@ -189,6 +193,23 @@ class VMDaemon(Daemon):
                         UPDATE instances SET params=? WHERE openstack_uuid=?
                     """, [json.dumps(instance), instance.get('id')])
                 self.conn.commit()
+            elif instance_status == 'ERROR':
+                is_retry = bool(self.cur.execute("SELECT is_retry FROM queue WHERE id=?", [rid,]).fetchone()[0])
+                if is_retry:
+                    self.delete_instance(instance_id)
+                    response_for_bill = "ERROR instance creation is broken"
+                    self.cur.execute("UPDATE queue SET response=? WHERE id=?", [response_for_bill, rid])
+                else:
+                    self.cur.execute("UPDATE queue SET is_retry=1 WHERE id=?", [rid,])
+                    logging.info("Set queue task {0} param to recreate instance".format(rid))
+                self.conn.commit()
+
+                logging.error("Instance {0} have status {1}. Try to recreate it".format(instance_id, instance_status))
+
+                self.delete_instance(instance_id)
+                #run ident_command to create the new one
+                self.ident_command(rid, command, params)
+
             else:
                 logging.warning("Instance {0} have status {1}".format(instance_id, instance_status))
             return None

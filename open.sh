@@ -15,4 +15,4 @@ cd /opt/billmgr
 resp=`python3 wrapper.py commandfile=open $s_args`
 read -a strarr <<< $resp
 r=`python3 callback.py --request_id=${strarr[0]}`
-echo "OK $r"
+echo "$r"

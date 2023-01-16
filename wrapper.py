@@ -23,7 +23,8 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS queue(
     is_done INTEGER DEFAULT 0,
     params TEXT,
     result TEXT,
-    response TEXT);""")
+    response TEXT,
+    is_retry INTEGER DEFAULT 0);""")
 conn.commit()
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS users(
