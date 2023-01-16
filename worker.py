@@ -249,6 +249,7 @@ class VMDaemon(Daemon):
                 [result, response_for_bill, rid]
             )
             self.conn.commit()
+            return None
 
         elif command == "resume":
             result = json.dumps({"status":"DONE"})
@@ -257,8 +258,8 @@ class VMDaemon(Daemon):
                 [result, response_for_bill, rid]
             )
             self.conn.commit()
-        elif command == "setparam":
-            pass
+            return None
+
         elif command == "suspend":
             result = json.dumps({"status":"DONE"})
             response_for_bill = "OK"
@@ -266,6 +267,11 @@ class VMDaemon(Daemon):
                 [result, response_for_bill, rid]
             )
             self.conn.commit()
+            return None
+
+        elif command == "setparam":
+            pass
+
         return 'Command not exists on readiness'
 
     def prepare_data(self, data, set_on_process=False):
