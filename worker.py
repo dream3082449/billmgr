@@ -150,13 +150,13 @@ class VMDaemon(Daemon):
             data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
             if data:
                 self.delete_instance(data[0])
-                result = json.dumps({"status":"DONE"})
-                response_for_bill = "OK"
-                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
-                    [result, response_for_bill, rid]
-                )
             else:
                 logging.warning("Instance for product_id {0} not found, so can`t be deleted".format(params.get('user')))
+            result = json.dumps({"status":"DONE"})
+            response_for_bill = "OK"
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                [result, response_for_bill, rid]
+            )
             return None
 
         elif command == "suspend":
@@ -167,14 +167,14 @@ class VMDaemon(Daemon):
                     logging.warning("The instance status for product_id {0} is not 'active' , so it cannot be suspended".format(params.get('user')))
                     return None
                 self.suspend_instance(data[0])
-                result = json.dumps({"status":"DONE"})
-                response_for_bill = "OK"
-                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
-                    [result, response_for_bill, rid]
-                )
                 logging.info("Instance {0} suspended".format(data[0]))
             else:
                 logging.warning("Instance for product_id {0} not found, so cannot be suspended".format(params.get('user')))
+            result = json.dumps({"status":"DONE"})
+            response_for_bill = "OK"
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                [result, response_for_bill, rid]
+            )
             return None
 
         elif command == "resume":
@@ -185,14 +185,14 @@ class VMDaemon(Daemon):
                     logging.warning("The instance status for product_id {0} is not 'PAUSED' , so it cannot resumed".format(params.get('user')))
                     return None
                 self.suspend_instance(data[0])
-                result = json.dumps({"status":"DONE"})
-                response_for_bill = "OK"
-                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
-                    [result, response_for_bill, rid]
-                )
                 logging.info("Instance {0} resumed".format(data[0]))
             else:
                 logging.warning("Instance for product_id {0} not found, so cannot be resumed".format(params.get('user')))
+            result = json.dumps({"status":"DONE"})
+            response_for_bill = "OK"
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                [result, response_for_bill, rid]
+            )
             return None
 
         elif command == "setparam":
