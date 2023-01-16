@@ -150,6 +150,7 @@ class VMDaemon(Daemon):
             data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
             if data:
                 self.delete_instance(data[0])
+                self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
             else:
                 logging.warning("Instance for product_id {0} not found, so can`t be deleted".format(params.get('user')))
             result = json.dumps({"status":"DONE"})
@@ -157,7 +158,6 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
                 [result, response_for_bill, rid]
             )
-            self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
             self.conn.commit()
             return None
 
