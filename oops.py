@@ -120,6 +120,9 @@ class oops_helper(object):
         return self.conn.compute.create_server(**p)
 
     def get_instance_status(self, instance_id):
+        """
+            Return instance_status, instance or None, None
+        """
         ii = self.conn.compute.find_server(instance_id)
         if ii:
             instance = ii.to_dict()
@@ -128,10 +131,18 @@ class oops_helper(object):
             ## SHUTOFF, SOFT_DELETED, STOPPED, SUSPENDED, UNKNOWN, or VERIFY_RESIZE
             return instance.get('status'), instance
         else:
-            return None
+            return None, None
 
     def remove_instance(self, instance_id):
         self.conn.compute.delete_server(instance_id)
+        return True
+
+    def resume_instance(self, instance_id):
+        self.conn.compute.resume_server(instance_id)
+        return True
+
+    def suspend_instance(self, instance_id):
+        self.conn.compute.suspend_server(instance_id)
         return True
 
 

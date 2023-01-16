@@ -137,7 +137,6 @@ class VMDaemon(Daemon):
 
             logging.info("Instance {0} is CREATED".format(instance.get('id')))
 
-
             self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
             self.cur.execute("""
                 INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
@@ -145,29 +144,62 @@ class VMDaemon(Daemon):
             self.conn.commit()
             return j_instance
 
-
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
         elif command == "close":
             data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
             if data:
                 self.delete_instance(data[0])
-                result = {}
-                response_for_bill = "OK --user={0} --action=deleted".format(params.get('user'))
+                result = json.dumps({"status":"DONE"})
+                response_for_bill = "OK"
                 self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
                     [result, response_for_bill, rid]
                 )
+            else:
+                logging.warning("Instance for product_id {0} not found, so can`t be deleted".format(params.get('user')))
+            return None
+
+        elif command == "suspend":
+            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
+            if data:
+                i_status, _ = self.helper.get_instance_status(data[0])
+                if i_status != 'ACTIVE':
+                    logging.warning("The instance status for product_id {0} is not 'active' , so it cannot be suspended".format(params.get('user')))
+                    return None
+                self.suspend_instance(data[0])
+                result = json.dumps({"status":"DONE"})
+                response_for_bill = "OK"
+                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                    [result, response_for_bill, rid]
+                )
+                logging.info("Instance {0} suspended".format(data[0]))
+            else:
+                logging.warning("Instance for product_id {0} not found, so cannot be suspended".format(params.get('user')))
             return None
 
         elif command == "resume":
-            print(command)
-#            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 3)""")
+            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
+            if data:
+                i_status, _ = self.helper.get_instance_status(data[0])
+                if i_status != 'PAUSED':
+                    logging.warning("The instance status for product_id {0} is not 'PAUSED' , so it cannot resumed".format(params.get('user')))
+                    return None
+                self.suspend_instance(data[0])
+                result = json.dumps({"status":"DONE"})
+                response_for_bill = "OK"
+                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                    [result, response_for_bill, rid]
+                )
+                logging.info("Instance {0} resumed".format(data[0]))
+            else:
+                logging.warning("Instance for product_id {0} not found, so cannot be resumed".format(params.get('user')))
+            return None
+
         elif command == "setparam":
+
+
             print(command)
-#            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 4)""")
-        elif command == "suspend":
-            print(command)
-#            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 5)""")
+
 
         return 'Command does not exist'
 
@@ -189,8 +221,9 @@ class VMDaemon(Daemon):
             if instance_status == 'ACTIVE':
                 logging.info("Instance {0} is ACTIVE".format(instance_id))
 
-                response_for_bill = "OK --username={0} --password={1} --ip-addr={2}".format(
+                response_for_bill = "OK --id={0} --username={1} --password={2} --ip-addr={3}".format(
                     params.get('user'),
+                    'root',
                     params.get('password'),
                     instance['addresses']['provider'][0]['addr']
                 )
