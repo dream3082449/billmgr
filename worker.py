@@ -149,8 +149,16 @@ class VMDaemon(Daemon):
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
         elif command == "close":
-            print(command)
-#            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 2)""")
+            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
+            if data:
+                self.delete_instance(data[0])
+                result = {}
+                response_for_bill = "OK --user={0} --action=deleted".format(params.get('user'))
+                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                    [result, response_for_bill, rid]
+                )
+            return None
+
         elif command == "resume":
             print(command)
 #            cursor.execute("""INSERT INTO queue (on_process) VALUES (ID 3)""")
@@ -187,7 +195,7 @@ class VMDaemon(Daemon):
                     instance['addresses']['provider'][0]['addr']
                 )
                 self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
-                        [json.dumps(instance), response_for_bill, str(rid)]
+                        [json.dumps(instance), response_for_bill, rid]
                     )
                 self.cur.execute("""
                         UPDATE instances SET params=? WHERE openstack_uuid=?
@@ -239,13 +247,13 @@ class VMDaemon(Daemon):
             for row in self.get_queue():
                 rid, command, params, _ = self.prepare_data(row, set_on_process=True)
                 logging.info(f"%s %s" % (command, json.dumps(params)))
-                res = self.ident_command(rid, command, params)
+                self.ident_command(rid, command, params)
                 logging.info("Command %s with params %s on process." % (command, json.dumps(params)))
 
             for row in self.get_queue(on_process=True):
                 rid, command, params, result = self.prepare_data(row)
                 logging.info(f"%s %s" % (command, json.dumps(params)))
-                res = self.check_command_readiness(rid, command, params, result)
+                self.check_command_readiness(rid, command, params, result)
                 logging.info("Command %s is DONE with result %s" % (command, result))
 
             #FOR DEBUG
