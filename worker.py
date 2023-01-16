@@ -147,12 +147,12 @@ class VMDaemon(Daemon):
 #            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
         elif command == "close":
-            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
+            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
             if data:
                 self.delete_instance(data[0])
                 self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
             else:
-                logging.warning("Instance for product_id {0} not found, so can`t be deleted".format(params.get('user')))
+                logging.warning("Instance for product_id {0} not found, so can`t be deleted".format(params.get('id')))
             result = json.dumps({"status":"DONE"})
             response_for_bill = "OK"
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
@@ -162,7 +162,7 @@ class VMDaemon(Daemon):
             return None
 
         elif command == "suspend":
-            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
+            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
             if data:
                 i_status, _ = self.helper.get_instance_status(data[0])
                 if i_status != 'ACTIVE':
@@ -171,7 +171,7 @@ class VMDaemon(Daemon):
                 self.suspend_instance(data[0])
                 logging.info("Instance {0} suspended".format(data[0]))
             else:
-                logging.warning("Instance for product_id {0} not found, so cannot be suspended".format(params.get('user')))
+                logging.warning("Instance for product_id {0} not found, so cannot be suspended".format(params.get('id')))
             result = json.dumps({"status":"DONE"})
             response_for_bill = "OK"
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
@@ -181,7 +181,7 @@ class VMDaemon(Daemon):
             return None
 
         elif command == "resume":
-            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('user'),]).fetchone()
+            data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
             if data:
                 i_status, _ = self.helper.get_instance_status(data[0])
                 if i_status != 'PAUSED':
@@ -190,7 +190,7 @@ class VMDaemon(Daemon):
                 self.suspend_instance(data[0])
                 logging.info("Instance {0} resumed".format(data[0]))
             else:
-                logging.warning("Instance for product_id {0} not found, so cannot be resumed".format(params.get('user')))
+                logging.warning("Instance for product_id {0} not found, so cannot be resumed".format(params.get('id')))
             result = json.dumps({"status":"DONE"})
             response_for_bill = "OK"
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
