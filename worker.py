@@ -157,6 +157,7 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
                 [result, response_for_bill, rid]
             )
+            self.conn.commit()
             return None
 
         elif command == "suspend":
@@ -175,6 +176,7 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
                 [result, response_for_bill, rid]
             )
+            self.conn.commit()
             return None
 
         elif command == "resume":
@@ -193,6 +195,7 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
                 [result, response_for_bill, rid]
             )
+            self.conn.commit()
             return None
 
         elif command == "setparam":
