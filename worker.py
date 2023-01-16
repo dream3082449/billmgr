@@ -157,6 +157,7 @@ class VMDaemon(Daemon):
             self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
                 [result, response_for_bill, rid]
             )
+            self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
             self.conn.commit()
             return None
 
@@ -271,7 +272,7 @@ class VMDaemon(Daemon):
     def prepare_data(self, data, set_on_process=False):
         rid = data[0]
         if set_on_process:
-            self.cur.execute("UPDATE queue SET on_process=1 where id=?", [str(rid)])
+            self.cur.execute("UPDATE queue SET on_process=1 where id=?", [rid])
         r = json.loads(data[1])
         c = r.pop('commandfile')
         result = data[2] if data[2] else '{}'
