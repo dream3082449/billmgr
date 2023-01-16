@@ -164,7 +164,7 @@ class VMDaemon(Daemon):
                 if i_status != 'ACTIVE':
                     logging.warning("The instance status for product_id {0} is not 'active' , so it cannot be suspended".format(params.get('user')))
                     return None
-                self.suspend_instance(data[0])
+                self.helper.suspend_instance(data[0])
                 logging.info("Instance {0} suspended".format(data[0]))
             else:
                 logging.warning("Instance for product_id {0} not found, so cannot be suspended".format(params.get('id')))
@@ -177,7 +177,7 @@ class VMDaemon(Daemon):
                 if i_status != 'PAUSED':
                     logging.warning("The instance status for product_id {0} is not 'PAUSED' , so it cannot resumed".format(params.get('user')))
                     return None
-                self.suspend_instance(data[0])
+                self.helper.suspend_instance(data[0])
                 logging.info("Instance {0} resumed".format(data[0]))
             else:
                 logging.warning("Instance for product_id {0} not found, so cannot be resumed".format(params.get('id')))
