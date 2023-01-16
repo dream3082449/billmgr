@@ -151,14 +151,9 @@ class VMDaemon(Daemon):
             if data:
                 self.delete_instance(data[0])
                 self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
+                self.conn.commit()
             else:
                 logging.warning("Instance for product_id {0} not found, so can`t be deleted".format(params.get('id')))
-            result = json.dumps({"status":"DONE"})
-            response_for_bill = "OK"
-            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
-                [result, response_for_bill, rid]
-            )
-            self.conn.commit()
             return None
 
         elif command == "suspend":
@@ -172,12 +167,6 @@ class VMDaemon(Daemon):
                 logging.info("Instance {0} suspended".format(data[0]))
             else:
                 logging.warning("Instance for product_id {0} not found, so cannot be suspended".format(params.get('id')))
-            result = json.dumps({"status":"DONE"})
-            response_for_bill = "OK"
-            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
-                [result, response_for_bill, rid]
-            )
-            self.conn.commit()
             return None
 
         elif command == "resume":
@@ -191,12 +180,6 @@ class VMDaemon(Daemon):
                 logging.info("Instance {0} resumed".format(data[0]))
             else:
                 logging.warning("Instance for product_id {0} not found, so cannot be resumed".format(params.get('id')))
-            result = json.dumps({"status":"DONE"})
-            response_for_bill = "OK"
-            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
-                [result, response_for_bill, rid]
-            )
-            self.conn.commit()
             return None
 
         elif command == "setparam":
@@ -260,13 +243,29 @@ class VMDaemon(Daemon):
             return None
 
         elif command == "close":
-            pass
+            result = json.dumps({"status":"DONE"})
+            response_for_bill = "OK"
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                [result, response_for_bill, rid]
+            )
+            self.conn.commit()
+
         elif command == "resume":
-            pass
+            result = json.dumps({"status":"DONE"})
+            response_for_bill = "OK"
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                [result, response_for_bill, rid]
+            )
+            self.conn.commit()
         elif command == "setparam":
             pass
         elif command == "suspend":
-            pass
+            result = json.dumps({"status":"DONE"})
+            response_for_bill = "OK"
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?", 
+                [result, response_for_bill, rid]
+            )
+            self.conn.commit()
         return 'Command not exists on readiness'
 
     def prepare_data(self, data, set_on_process=False):
