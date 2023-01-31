@@ -183,11 +183,15 @@ class VMDaemon(Daemon):
                 logging.warning("Instance for product_id {0} not found, so cannot be resumed".format(params.get('id')))
             return None
 
+        ### TODO
         elif command == "setparam":
-
-
-            print(command)
-
+            if params.get('change_volume_size', False):
+                pass
+            elif params.get('change_cpu', False):
+                pass
+            elif params.get('change_ram', False):
+                pass
+        ### END TODO
 
         return 'Command does not exist'
 
@@ -271,8 +275,11 @@ class VMDaemon(Daemon):
             self.conn.commit()
             return None
 
+        ### TODO
         elif command == "setparam":
             pass
+
+        ### END TODO
 
         return 'Command not exists on readiness'
 
