@@ -42,10 +42,15 @@ cursor = conn.cursor()
 logging.info("Run callback with request_id={0}".format(params['request_id']))
 
 while True:
-    data = cursor.execute(
-        """SELECT response FROM vmdaemon_db.queue WHERE request_id=(?) AND is_done=1 AND on_process=0;""",
-        [params['request_id']]
-        ).fetchone()
+#    data = cursor.execute(
+#        """SELECT response FROM vmdaemon_db.queue WHERE request_id=(?) AND is_done=1 AND on_process=0;""",
+#         [params['request_id']]
+#        ).fetchone()
+    cursor.execute(
+        """SELECT response FROM vmdaemon_db.queue WHERE request_id=(%s) AND is_done=1 AND on_process=0;""",
+         [params['request_id']]
+        )
+    data = cursor.fetchone()
     conn.commit()
     if data:
         logger.info('Successful response to billing: '.format(data[0]))
