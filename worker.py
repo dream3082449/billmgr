@@ -51,41 +51,45 @@ class VMDaemon(Daemon):
         # c = self.cur.execute("""
         #     SELECT id, params, result from queue where is_done=false and on_process=? order by created ASC LIMIT 1
         #     """, [on_process,]).fetchall()
-        c = self.cur.execute("""
-            SELECT id, params, result from vmdaemon_db.queue where is_done=false and on_process=? order by created ASC LIMIT 1
-            """, [on_process,]).fetchall()
+        self.cur.execute("""
+            SELECT id, params, result from vmdaemon_db.queue where is_done=false and on_process=(%s) order by created ASC LIMIT 1
+            """, [on_process,])
+        c = cur.fetchall()
         return c
 
     def insert_or_update_user(self, params):
         ### params = [user_id, username, project_name, email]
         # c = self.cur.execute("SELECT id from users where username=?", [params[1]]).fetchall()
-        c = self.cur.execute("SELECT id from vmdaemon_db.users where username=?", [params[1]]).fetchall()
+        self.cur.execute("SELECT id from vmdaemon_db.users where username=(%s)", [params[1]])
+        c = cur.fetchall()
         if not c:
             # self.cur.execute("""
             #     INSERT INTO users (id, username, project, email) VALUES (?, ?, ?, ?);
             #     """, params)
             self.cur.execute("""
-                INSERT INTO vmdaemon_db.users (id, username, project, email) VALUES (?, ?, ?, ?);
+                INSERT INTO vmdaemon_db.users (id, username, project, email) VALUES (%s, %s, %s, %s);
                 """, params)
         else:
             # self.cur.execute("""
             #     UPDATE users set email=? where username=?
             #     """, [params[3], params[1]])
             self.cur.execute("""
-                UPDATE vmdaemon_db.users set email=? where username=?
+                UPDATE vmdaemon_db.users set email=(%s) where username=(%s)
                 """, [params[3], params[1]])
         self.conn.commit()
         return None
 
     def check_image_by_name(self, name):
         # o = self.cur.execute("SELECT openstack_uuid from os_images WHERE billing_name = ?", [name,]).fetchone()
-        o = self.cur.execute("SELECT vmdaemon_db.openstack_uuid from os_images WHERE billing_name = ?", [name,]).fetchone()
+        self.cur.execute("SELECT vmdaemon_db.openstack_uuid from os_images WHERE billing_name = ?", [name,])
+        o = cur.fetchone()
         if o:
             os_id = o[0]
         else:
             os_id = o
         # c = self.cur.execute("SELECT COUNT(1) from os_images").fetchone()[0]
-        c = self.cur.execute("SELECT COUNT(1) from vmdaemon_db.os_images").fetchone()[0]
+        self.cur.execute("SELECT COUNT(1) from vmdaemon_db.os_images")
+        c = cur.fetchone()[0]
         if not os_id and c == 0:
             for i in self.helper.list_images():
                 c += 1
@@ -93,7 +97,7 @@ class VMDaemon(Daemon):
                 # INSERT INTO os_images (openstack_uuid, openstack_name, billing_name) VALUES (?, ?, ?);
                 # """, [i[0], i[1], "bill_name_{0}".format(c)])
                 self.cur.execute("""
-                INSERT INTO vmdaemon_db.os_images (openstack_uuid, openstack_name, billing_name) VALUES (?, ?, ?);
+                INSERT INTO vmdaemon_db.os_images (openstack_uuid, openstack_name, billing_name) VALUES (%s, %s, %s);
                 """, [i[0], i[1], "bill_name_{0}".format(c)])
                 os_id = i[0]
             self.conn.commit()
@@ -148,7 +152,7 @@ class VMDaemon(Daemon):
             #     INSERT INTO flavors (project_id, flavor_id) VALUES (?, ?); 
             # """, [project.get('id'), flavor.get('id')])
             self.cur.execute("""
-                INSERT INTO vmdaemon_db.flavors (project_id, flavor_id) VALUES (?, ?); 
+                INSERT INTO vmdaemon_db.flavors (project_id, flavor_id) VALUES (%s, %s); 
             """, [project.get('id'), flavor.get('id')])
             self.conn.commit()
 
@@ -168,7 +172,7 @@ class VMDaemon(Daemon):
             logging.info("Instance {0} is CREATED".format(instance.get('id')))
 
             # self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
-            self.cur.execute("UPDATE vmdaemon_db.queue SET result=? WHERE id=?", [j_instance, rid])
+            self.cur.execute("UPDATE vmdaemon_db.queue SET result=(%s) WHERE id=(%s)", [j_instance, rid])
             # self.cur.execute("""
             #     INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             # """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
@@ -182,11 +186,11 @@ class VMDaemon(Daemon):
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
         elif command == "close":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            data = self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
+            data = self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=(%s)", [params.get('id'),]).fetchone()
             if data:
                 self.delete_instance(data[0])
                 # self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
-                self.cur.execute("DELETE from vmdaemon_db.instances where openstack_uuid=?", [data[0]])
+                self.cur.execute("DELETE from vmdaemon_db.instances where openstack_uuid=(%s)", [data[0]])
                 self.conn.commit()
             else:
                 logging.warning("Instance for product_id {0} not found, so can`t be deleted".format(params.get('id')))
@@ -194,7 +198,8 @@ class VMDaemon(Daemon):
 
         elif command == "suspend":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            data = self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
+            self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=(%s)", [params.get('id'),])
+            data = cur.fetchone()
             if data:
                 i_status, _ = self.helper.get_instance_status(data[0])
                 if i_status != 'ACTIVE':
@@ -208,7 +213,8 @@ class VMDaemon(Daemon):
 
         elif command == "resume":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            data = self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
+            self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=(%s)", [params.get('id'),])
+            data = cur.fetchone()
             if data:
                 i_status, _ = self.helper.get_instance_status(data[0])
                 if i_status != 'SUSPENDED':
