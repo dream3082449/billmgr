@@ -148,7 +148,7 @@ else:
 	params['indent_id'] = None
 print(params['request_id'], params['indent_id'])
 
-cursor.execute("""INSERT INTO vmdaemon_db.queue (request_id, params) VALUES (?, ?);""", [params['request_id'], json.dumps(params)])
+cursor.execute("""INSERT INTO vmdaemon_db.queue (request_id, params) VALUES (%s, %s);""", [params['request_id'], json.dumps(params)])
 conn.commit() 
 
 cursor.close()
