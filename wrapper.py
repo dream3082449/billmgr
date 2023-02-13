@@ -1,6 +1,6 @@
 #!env python
 import sys, json
-import sqlite3
+#import sqlite3
 import uuid
 import MySQLdb
 
@@ -10,7 +10,7 @@ mysql_params = {
     "host": "193.106.172.90",
     "port": 3306,
     "user": "DmitryK",
-    "passwd": "dtpe,kbq",
+    "passwd": "",
     "db": "vmdaemon_db"
 }
 
@@ -21,8 +21,7 @@ for e, p in enumerate(sys.argv):
 	k, v = p.replace('--', '').split('=')
 	params[k] =v
 	
-#conn = sqlite3.connect('queues.db')
-#cursor = conn.cursor()
+# conn = sqlite3.connect('queues.db')
 conn = MySQLdb.connect(**mysql_params)
 cursor = conn.cursor()
 
@@ -149,7 +148,7 @@ else:
 	params['indent_id'] = None
 print(params['request_id'], params['indent_id'])
 
-cursor.execute("""INSERT INTO queue (request_id, params) VALUES (?, ?);""", [params['request_id'], json.dumps(params)])
+cursor.execute("""INSERT INTO vmdaemon_db.queue (request_id, params) VALUES (%s, %s);""", [params['request_id'], json.dumps(params)])
 conn.commit() 
 
 cursor.close()
