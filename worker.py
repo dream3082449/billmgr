@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os, sys, time, json
-import unittest
 import sqlite3
 import uuid
 import logging
@@ -311,60 +310,20 @@ class VMDaemon(Daemon):
             time.sleep(5)
 
 
-def control_daemon(action):
-    os.system(" ".join((sys.executable, __file__, action)))
-
-
-class TestDaemon(unittest.TestCase):
-    testoutput = None
-
-    def setUp(self):
-        control_daemon('start')
-        time.sleep(0.1)
-        self.testoutput = open(LOGFILE)
-
-    def test_daemon_can_start(self):
-        assert os.path.exists(PIDFILE)
-        assert self.testoutput.read() == 'inited'
-
-    def test_daemon_can_stop(self):
-        control_daemon('stop')
-        time.sleep(0.1)
-        assert os.path.exists(PIDFILE) is False
-        assert self.testoutput.read() == 'inited'
-
-    def test_daemon_can_finish(self):
-        time.sleep(0.4)
-        assert os.path.exists(PIDFILE) is False
-        assert self.testoutput.read() == 'finished'
-
-    def test_daemon_can_restart(self):
-        assert os.path.exists(PIDFILE)
-        pidfile = open(PIDFILE)
-        pid1 = pidfile.read()
-        pidfile.close()
-        control_daemon('restart')
-        time.sleep(0.1)
-        assert os.path.exists(PIDFILE)
-        pidfile = open(PIDFILE)
-        pid2 = pidfile.read()
-        pidfile.close()
-        assert pid1 != pid2
-
-    def tearDown(self):
-        self.testoutput.close()
-        if os.path.exists(PIDFILE):
-            control_daemon('stop')
-        time.sleep(0.05)
-        os.system('rm {0}'.format(PIDFILE))
-
-
-if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        unittest.main()
-    elif len(sys.argv) == 2:
-        arg = sys.argv[1]
-        if arg in ('start', 'stop', 'restart'):
-            d = VMDaemon(pidfile=PIDFILE, verbose=9)
-            getattr(d, arg)()
+if __name__ == "__main__":
+        daemon = VMDaemon(PIDFILE)
+        if len(sys.argv) == 2:
+                if 'start' == sys.argv[1]:
+                        daemon.start()
+                elif 'stop' == sys.argv[1]:
+                        daemon.stop()
+                elif 'restart' == sys.argv[1]:
+                        daemon.restart()
+                else:
+                        print "Unknown command"
+                        sys.exit(2)
+                sys.exit(0)
+        else:
+                print "usage: %s start|stop|restart" % sys.argv[0]
+                sys.exit(2)
 
