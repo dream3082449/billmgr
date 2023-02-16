@@ -1,6 +1,6 @@
 import sys, os, time, atexit, signal
 
-class daemon:
+class Daemon:
     """A generic daemon class.
 
     Usage: subclass the daemon class and override the run() method."""
