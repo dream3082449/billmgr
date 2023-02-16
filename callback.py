@@ -1,13 +1,15 @@
 #!env python
-import sys, json, time
-#import sqlite3
+import sys
+import json
+import time
+# import sqlite3
 import MySQLdb
 import uuid
 import logging
 
 
 LOGFILE = './callback.log'
-DEBUG=True
+DEBUG = True
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 logging.basicConfig(
@@ -18,12 +20,12 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-con = None # ?
+con = None  # ?
 
 mysql_params = {
-    "host": "193.106.172.90",
+    "host": "10.8.12.137",
     "port": 3306,
-    "user": "DmitryK",
+    "user": "daemon",
     "passwd": "",
     "db": "vmdaemon_db"
 }
@@ -33,23 +35,23 @@ for e, p in enumerate(sys.argv):
     if e == 0:
         continue
     k, v = p.replace('--', '').split('=')
-    params[k] =v
+    params[k] = v
 
-#conn = sqlite3.connect('/opt/billmgr/queues.db')
+# conn = sqlite3.connect('/opt/billmgr/queues.db')
 conn = MySQLdb.connect(**mysql_params)
 cursor = conn.cursor()
 
 logging.info("Run callback with request_id={0}".format(params['request_id']))
 
 while True:
-#    data = cursor.execute(
-#        """SELECT response FROM vmdaemon_db.queue WHERE request_id=(?) AND is_done=1 AND on_process=0;""",
-#         [params['request_id']]
-#        ).fetchone()
+    #    data = cursor.execute(
+    #        """SELECT response FROM vmdaemon_db.queue WHERE request_id=(?) AND is_done=1 AND on_process=0;""",
+    #         [params['request_id']]
+    #        ).fetchone()
     cursor.execute(
         """SELECT response FROM vmdaemon_db.queue WHERE request_id=(%s) AND is_done=1 AND on_process=0;""",
-         [params['request_id']]
-        )
+        [params['request_id']]
+    )
     data = cursor.fetchone()
     conn.commit()
     if data:
