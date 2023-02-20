@@ -10,7 +10,7 @@ from daemon import pidfile
 debug_p = False
 
 
-class VMDaemon(logger):
+class VMDaemon():
 
     def __init__(self, logger):
         self.conn = sqlite3.connect('queues.db')
