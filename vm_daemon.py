@@ -330,7 +330,7 @@ def start_daemon(pidf, logf):
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
         ) as context:
         runner(logf)
-
+    print(123123)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="BillManager to OpenStack integration daemon")
