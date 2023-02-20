@@ -7,7 +7,7 @@ import logging
 import daemon
 from daemon import pidfile
 
-debug_p = False
+debug_p = True
 
 
 class VMDaemon():
@@ -334,8 +334,8 @@ def start_daemon(pidf, logf):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="BillManager to OpenStack integration daemon")
-    parser.add_argument('-p', '--pid-file', default='/var/run/eg_daemon.pid')
-    parser.add_argument('-l', '--log-file', default='/var/log/eg_daemon.log')
+    parser.add_argument('-p', '--pid-file', default='/var/run/vm_daemon.pid')
+    parser.add_argument('-l', '--log-file', default='/var/log/vm_daemon.log')
 
     args = parser.parse_args()
     
