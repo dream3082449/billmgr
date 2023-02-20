@@ -4,8 +4,8 @@ import os
 import time
 import argparse
 import logging
-from daemon import Daemon
-from Daemon import pidfile
+import daemon
+from daemon import pidfile
 
 debug_p = False
 
@@ -324,7 +324,7 @@ def start_daemon(pidf, logf):
         print("vm_daemon: about to start daemonization")
 
     ### XXX pidfile is a context
-    with Daemon.DaemonContext(
+    with daemon.DaemonContext(
         working_directory=os.getcwd(),
         umask=0o002,
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
