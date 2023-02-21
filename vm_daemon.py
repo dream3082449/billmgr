@@ -7,6 +7,8 @@ import logging
 import daemon
 from daemon import pidfile
 from MySQLdb import _mysql
+from oops import oops_helper
+
 
 debug_p = True
 
@@ -22,7 +24,7 @@ class VMDaemon():
 
     def __init__(self, logger):
         self.conn = _mysql.connect(**mysql_params)
-        self.cur = conn.cursor()
+        self.cur = self.conn.cursor()
         self.logger = logger
         self.helper = oops_helper()
 
