@@ -14,7 +14,7 @@ mysql_params = {
     "host": "10.8.12.137",
     "port": 3306,
     "user": "daemon",
-    "passwd": "",
+    "passwd": "M27h_w59Y$qD13",
     "db": "vmdaemon_db"
 }
 
