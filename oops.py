@@ -9,19 +9,19 @@ openstack.enable_logging(True, stream=sys.stdout)
 
 class oops_helper(object):
 
-    mysql_params = {
-        "host": "10.8.12.186",
-        "port": 3306,
-        "user": "os_user",
-        "passwd": "dtpe,kbq",
-        "db": "billmgr"
-    }
-
-    mysql_conn = MySQLdb.connect(**mysql_params)
-    mysql_cursor = mysql_conn.cursor()
-
-    # Initialize connection
-    conn = openstack.connect(cloud='openstack')
+    def __init__(self, config):
+        self.config = config
+        self.mysql_conn = MySQLdb.connect(
+            host=config.get('BillingDB', 'host'),
+            port=config.get('BillingDB', 'port'),
+            port=config.get('BillingDB', 'user'),
+            password=config.get('BillingDB', 'password'),
+            database=config.get('BillingDB', 'db_name')
+        )
+        self.mysql_cursor = self.mysql_conn.cursor()
+        # Initialize connection
+        conn = openstack.connect(cloud='openstack')
+    
 
     def product_id_to_username(self, product_id, username_only=False):
         query = """SELECT i.account as id, u.email FROM item i LEFT JOIN user u on i.account=u.account WHERE i.id =%s"""

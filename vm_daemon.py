@@ -1,32 +1,52 @@
 #!env python3
-import sys
-import os
-import time
+import sys, os, time
 import argparse
 import logging
+import configparser
 import daemon
 from daemon import pidfile
-from MySQLdb import _mysql
+import MySQLdb
 from oops import oops_helper
-
 
 debug_p = True
 
-mysql_params = {
-    "host": "10.8.12.137",
-    "port": 3306,
-    "user": "daemon",
-    "passwd": "M27h_w59Y$qD13",
-    "db": "vmdaemon_db"
-}
+def createConfig(path):
+    if  os.path.exists(path):
+        return None
 
-class VMDaemon():
+    config = configparser.ConfigParser()
+    config.add_section("MainDB")
+    config.set("MainDB", "host", "10.8.12.137")
+    config.set("MainDB", "port", "3306")
+    config.set("MainDB", "user", "daemon")
+    config.set("MainDB", "password", "M27h_w59Y$qD13")
+    config.set("MainDB", "db_name", "vmdaemon_db")
 
-    def __init__(self, logger):
-        self.conn = _mysql.connect(**mysql_params)
+    config.add_section("BillingDB")
+    config.set("MainDB", "host", "10.8.12.186")
+    config.set("MainDB", "port", "3306")
+    config.set("MainDB", "user", "os_user")
+    config.set("MainDB", "passwd", "dtpe,kbq")
+    config.set("MainDB", "db", "billmgr")
+    
+    with open(path, "w") as config_file:
+        config.write(config_file)
+
+
+class VMDaemon(object):
+
+    def __init__(self, logger, config):
+        self.config = config
+        self.conn = MySQLdb.connect(
+            host=config.get('MainDB', 'host'),
+            port=config.get('MainDB', 'port'),
+            port=config.get('MainDB', 'user'),
+            password=config.get('MainDB', 'password'),
+            database=config.get('MainDB', 'db_name')
+        )
         self.cur = self.conn.cursor()
         self.logger = logger
-        self.helper = oops_helper()
+        self.helper = oops_helper(config)
 
     def get_queue(self, on_process=False):
         c = self.cur.execute("""
@@ -373,7 +393,7 @@ class VMDaemon():
             time.sleep(5)
 
 
-def runner(logf):
+def runner(logf, config):
     ### This does the "work" of the daemon
 
     logger = logging.getLogger('vm_daemon')
@@ -389,11 +409,11 @@ def runner(logf):
 
     logger.addHandler(fh)
     logger.info("Run VMDaemon")
-    vmd = VMDaemon(logger)
+    vmd = VMDaemon(logger, config)
     vmd.run()
 
 
-def start_daemon(pidf, logf):
+def start_daemon(pidf, logf, config):
     ### This launches the daemon in its context
 
     global debug_p
@@ -409,8 +429,7 @@ def start_daemon(pidf, logf):
         umask=0o002,
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
         ) as context:
-        runner(logf)
-    print(123123)
+        runner(logf, config)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="BillManager to OpenStack integration daemon")
@@ -418,5 +437,10 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--log-file', default='/var/log/vm_daemon.log')
 
     args = parser.parse_args()
+
+    path = "/".join(os.getcwd(),"settings.ini")
+    createConfig(path)
+    config = configparser.ConfigParser()
+    config.read(path)
     
-    start_daemon(pidf=args.pid_file, logf=args.log_file)
+    start_daemon(pidf=args.pid_file, logf=args.log_file, config=config)
