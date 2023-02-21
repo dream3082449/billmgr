@@ -40,7 +40,7 @@ class VMDaemon(object):
         self.conn = MySQLdb.connect(
             host=config.get('MainDB', 'host'),
             port=config.get('MainDB', 'port'),
-            port=config.get('MainDB', 'user'),
+            user=config.get('MainDB', 'user'),
             password=config.get('MainDB', 'password'),
             database=config.get('MainDB', 'db_name')
         )
