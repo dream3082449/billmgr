@@ -23,11 +23,11 @@ def createConfig(path):
     config.set("MainDB", "db_name", "vmdaemon_db")
 
     config.add_section("BillingDB")
-    config.set("MainDB", "host", "10.8.12.186")
-    config.set("MainDB", "port", 3306)
-    config.set("MainDB", "user", "os_user")
-    config.set("MainDB", "passwd", "dtpe,kbq")
-    config.set("MainDB", "db", "billmgr")
+    config.set("BillingDB", "host", "10.8.12.186")
+    config.set("BillingDB", "port", 3306)
+    config.set("BillingDB", "user", "os_user")
+    config.set("BillingDB", "password", "dtpe,kbq")
+    config.set("BillingDB", "db_name", "billmgr")
     
     with open(path, "w") as config_file:
         config.write(config_file)
@@ -42,7 +42,7 @@ class VMDaemon(object):
             port=config.get('MainDB', 'port'),
             user=config.get('MainDB', 'user'),
             password=config.get('MainDB', 'password'),
-            database=config.get('MainDB', 'db_name')
+            db=config.get('MainDB', 'db_name')
         )
         self.cur = self.conn.cursor()
         self.logger = logger
