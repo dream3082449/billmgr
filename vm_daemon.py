@@ -17,14 +17,14 @@ def createConfig(path):
     config = configparser.ConfigParser()
     config.add_section("MainDB")
     config.set("MainDB", "host", "10.8.12.137")
-    config.set("MainDB", "port", 3306)
+    config.set("MainDB", "port", "3306")
     config.set("MainDB", "user", "daemon")
     config.set("MainDB", "password", "M27h_w59Y$qD13")
     config.set("MainDB", "db_name", "vmdaemon_db")
 
     config.add_section("BillingDB")
     config.set("BillingDB", "host", "10.8.12.186")
-    config.set("BillingDB", "port", 3306)
+    config.set("BillingDB", "port", "3306")
     config.set("BillingDB", "user", "os_user")
     config.set("BillingDB", "password", "dtpe,kbq")
     config.set("BillingDB", "db_name", "billmgr")
@@ -39,7 +39,7 @@ class VMDaemon(object):
         self.config = config
         self.conn = MySQLdb.connect(
             host=config.get('MainDB', 'host'),
-            port=config.get('MainDB', 'port'),
+            port=int(config.get('MainDB', 'port'),
             user=config.get('MainDB', 'user'),
             password=config.get('MainDB', 'password'),
             db=config.get('MainDB', 'db_name')
