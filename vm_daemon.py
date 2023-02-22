@@ -50,7 +50,7 @@ class VMDaemon(object):
 
     def get_queue(self, on_process=False):
         c = self.cur.execute("""
-            SELECT id, params, result from queue where is_done=false and on_process=? order by created ASC LIMIT 1
+            SELECT id, params, result from queue where is_done=false and on_process=%s order by created ASC LIMIT 1
             """, [on_process,]).fetchall()
         return c
 
