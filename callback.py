@@ -6,7 +6,11 @@ import time
 import MySQLdb
 import uuid
 import logging
+import config
 
+path = "/".join([os.getcwd(),"settings.ini"])
+config = configparser.ConfigParser()
+config.read(path)
 
 LOGFILE = './callback.log'
 DEBUG = True
@@ -20,15 +24,6 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 
-con = None  # ?
-
-mysql_params = {
-    "host": "10.8.12.137",
-    "port": 3306,
-    "user": "daemon",
-    "passwd": "",
-    "db": "vmdaemon_db"
-}
 
 params = dict()
 for e, p in enumerate(sys.argv):
@@ -38,8 +33,13 @@ for e, p in enumerate(sys.argv):
     params[k] = v
 
 # conn = sqlite3.connect('/opt/billmgr/queues.db')
-conn = MySQLdb.connect(**mysql_params)
-cursor = conn.cursor()
+conn = MySQLdb.connect(
+            host=config.get('MainDB', 'host'),
+            port=int(config.get('MainDB', 'port')),
+            user=config.get('MainDB', 'user'),
+            password=config.get('MainDB', 'password'),
+            db=config.get('MainDB', 'db_name')
+        )cursor = conn.cursor()
 
 logging.info("Run callback with request_id={0}".format(params['request_id']))
 
