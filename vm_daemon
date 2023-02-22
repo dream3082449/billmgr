@@ -43,7 +43,7 @@ start() {
                 return 0
             fi
         fi
-        $eg_daemon -p $pidfile -l $logfile $OPTIONS
+        $vm_daemon -p $pidfile -l $logfile $OPTIONS
         RETVAL=$?
         [ $RETVAL = 0 ] && success || failure
         echo
@@ -82,7 +82,7 @@ case "$1" in
     stop
     ;;
   status)
-    status -p $pidfile $eg_daemon
+    status -p $pidfile $vm_daemon
     RETVAL=$?
     ;;
   restart)
