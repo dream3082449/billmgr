@@ -17,14 +17,14 @@ def createConfig(path):
     config = configparser.ConfigParser()
     config.add_section("MainDB")
     config.set("MainDB", "host", "10.8.12.137")
-    config.set("MainDB", "port", "3306")
+    config.set("MainDB", "port", 3306)
     config.set("MainDB", "user", "daemon")
     config.set("MainDB", "password", "M27h_w59Y$qD13")
     config.set("MainDB", "db_name", "vmdaemon_db")
 
     config.add_section("BillingDB")
     config.set("MainDB", "host", "10.8.12.186")
-    config.set("MainDB", "port", "3306")
+    config.set("MainDB", "port", 3306)
     config.set("MainDB", "user", "os_user")
     config.set("MainDB", "passwd", "dtpe,kbq")
     config.set("MainDB", "db", "billmgr")
@@ -438,7 +438,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    path = "/".join(os.getcwd(),"settings.ini")
+    path = "/".join([os.getcwd(),"settings.ini"])
     createConfig(path)
     config = configparser.ConfigParser()
     config.read(path)
