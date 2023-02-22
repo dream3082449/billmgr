@@ -4,16 +4,13 @@ import json
 # import sqlite3
 import uuid
 import MySQLdb
+import config
+
+path = "/".join([os.getcwd(),"settings.ini"])
+config = configparser.ConfigParser()
+config.read(path)
 
 con = None
-
-mysql_params = {
-    "host": "10.8.12.137",
-    "port": 3306,
-    "user": "daemon",
-    "passwd": "",
-    "db": "vmdaemon_db"
-}
 
 params = dict()
 for e, p in enumerate(sys.argv):
@@ -22,8 +19,15 @@ for e, p in enumerate(sys.argv):
 	k, v = p.replace('--', '').split('=')
 	params[k] = v
 
+
 # conn = sqlite3.connect('queues.db')
-conn = MySQLdb.connect(**mysql_params)
+conn = MySQLdb.connect(
+            host=config.get('MainDB', 'host'),
+            port=int(config.get('MainDB', 'port')),
+            user=config.get('MainDB', 'user'),
+            password=config.get('MainDB', 'password'),
+            db=config.get('MainDB', 'db_name')
+        )
 cursor = conn.cursor()
 
 # cursor.execute("""CREATE TABLE IF NOT EXISTS queue(
