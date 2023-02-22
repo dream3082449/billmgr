@@ -408,7 +408,7 @@ def runner(logf, config):
     fh.setFormatter(formatter)
 
     logger.addHandler(fh)
-    logger.info("Run VMDaemon")
+    logger.info("Run VMDaemon: PID %s" % os.getpid())
     vmd = VMDaemon(logger, config)
     vmd.run()
 
