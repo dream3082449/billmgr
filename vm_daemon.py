@@ -49,10 +49,10 @@ class VMDaemon(object):
         self.helper = oops_helper(config)
 
     def get_queue(self, on_process=False):
-        c = self.cur.execute("""
+        self.cur.execute("""
             SELECT id, params, result from queue where is_done=false and on_process=%s order by created ASC LIMIT 1
-            """, [on_process,]).fetchall()
-        return c
+            """, [on_process,])
+        return self.cur.fetchall()
 
     def insert_or_update_user(self, params):
         # params = [user_id, username, project_name, email]
