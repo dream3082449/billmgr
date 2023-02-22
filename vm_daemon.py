@@ -428,6 +428,7 @@ def start_daemon(pidf, logf, config):
         working_directory=os.getcwd(),
         umask=0o002,
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
+        stderr=logf,
         ) as context:
         runner(logf, config)
 
