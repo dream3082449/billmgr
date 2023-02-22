@@ -13,10 +13,10 @@ class oops_helper(object):
         self.config = config
         self.mysql_conn = MySQLdb.connect(
             host=config.get('BillingDB', 'host'),
-            port=config.get('BillingDB', 'port'),
+            port=int(config.get('BillingDB', 'port')),
             user=config.get('BillingDB', 'user'),
             password=config.get('BillingDB', 'password'),
-            database=config.get('BillingDB', 'db_name')
+            db=config.get('BillingDB', 'db_name')
         )
         self.mysql_cursor = self.mysql_conn.cursor()
         # Initialize connection
