@@ -1,4 +1,4 @@
-#!env python3
+#! /bin/env python3
 import sys, os, time
 import argparse
 import logging
