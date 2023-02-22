@@ -10,8 +10,6 @@ path = "/".join([os.getcwd(),"settings.ini"])
 config = configparser.ConfigParser()
 config.read(path)
 
-con = None
-
 params = dict()
 for e, p in enumerate(sys.argv):
 	if e == 0:
