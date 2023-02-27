@@ -68,21 +68,21 @@ class VMDaemon(object):
         # params = [user_id, username, project_name, email]
         # c = self.cur.execute("SELECT id from users where username=?", [params[1]]).fetchall()
         self.cur.execute(
-            "SELECT id from vmdaemon_db.users where username= %s", [params[1]])
+            "SELECT id from users where username= %s", [params[1]])
         c = self.cur.fetchall()
         if not c:
             # self.cur.execute("""
             #     INSERT INTO users (id, username, project, email) VALUES (?, ?, ?, ?);
             #     """, params)
             self.cur.execute("""
-                INSERT INTO vmdaemon_db.users (id, username, project, email) VALUES (%s, %s, %s, %s);
+                INSERT INTO users (id, username, project, email) VALUES (%s, %s, %s, %s);
                 """, params)
         else:
             # self.cur.execute("""
             #     UPDATE users set email=? where username=?
             #     """, [params[3], params[1]])
             self.cur.execute("""
-                UPDATE vmdaemon_db.users set email=%s where username=%s
+                UPDATE users set email=%s where username=%s
                 """, [params[3], params[1]])
         self.conn.commit()
         return None
@@ -90,14 +90,14 @@ class VMDaemon(object):
     def check_image_by_name(self, name):
         # o = self.cur.execute("SELECT openstack_uuid from os_images WHERE billing_name = ?", [name,]).fetchone()
         self.cur.execute(
-            "SELECT vmdaemon_db.openstack_uuid from os_images WHERE billing_name = %s", [name,])
+            "SELECT openstack_uuid from os_images WHERE billing_name = %s", [name,])
         o = self.cur.fetchone()
         if o:
             os_id = o[0]
         else:
             os_id = o
         # c = self.cur.execute("SELECT COUNT(1) from os_images").fetchone()[0]
-        self.cur.execute("SELECT COUNT(1) from vmdaemon_db.os_images")
+        self.cur.execute("SELECT COUNT(1) from os_images")
         c = self.cur.fetchone()[0]
         if not os_id and c == 0:
             for i in self.helper.list_images():
@@ -106,7 +106,7 @@ class VMDaemon(object):
                 # INSERT INTO os_images (openstack_uuid, openstack_name, billing_name) VALUES (?, ?, ?);
                 # """, [i[0], i[1], "bill_name_{0}".format(c)])
                 self.cur.execute("""
-                INSERT INTO vmdaemon_db.os_images (openstack_uuid, openstack_name, billing_name) VALUES (%s, %s, %s);
+                INSERT INTO os_images (openstack_uuid, openstack_name, billing_name) VALUES (%s, %s, %s);
                 """, [i[0], i[1], "bill_name_{0}".format(c)])
                 os_id = i[0]
             self.conn.commit()
@@ -164,7 +164,7 @@ class VMDaemon(object):
             #     INSERT INTO flavors (project_id, flavor_id) VALUES (?, ?);
             # """, [project.get('id'), flavor.get('id')])
             self.cur.execute("""
-                INSERT INTO vmdaemon_db.flavors (project_id, flavor_id) VALUES (%s, %s); 
+                INSERT INTO flavors (project_id, flavor_id) VALUES (%s, %s); 
             """, [project.get('id'), flavor.get('id')])
             self.conn.commit()
 
@@ -184,13 +184,13 @@ class VMDaemon(object):
             logging.info("Instance {0} is CREATED".format(instance.get('id')))
 
             # self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
-            self.cur.execute("UPDATE vmdaemon_db.queue SET result=%s WHERE id=%s", [
+            self.cur.execute("UPDATE queue SET result=%s WHERE id=%s", [
                              j_instance, rid])
             # self.cur.execute("""
             #     INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             # """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
             self.cur.execute("""
-                INSERT INTO vmdaemon_db.instances (user_id, openstack_uuid, project, params) VALUES (%s, %s, %s, %s)
+                INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (%s, %s, %s, %s)
             """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
             self.conn.commit()
             return j_instance
@@ -199,14 +199,14 @@ class VMDaemon(object):
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
         elif command == "close":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=%s", [
+            self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=%s", [
                              params.get('id'),])
             data = self.cur.fetchone()
             if data:
                 self.delete_instance(data[0])
                 # self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
                 self.cur.execute(
-                    "DELETE from vmdaemon_db.instances where openstack_uuid=%s", [data[0]])
+                    "DELETE from instances where openstack_uuid=%s", [data[0]])
                 self.conn.commit()
             else:
                 logging.warning(
@@ -215,7 +215,7 @@ class VMDaemon(object):
 
         elif command == "suspend":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=%s", [
+            self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=%s", [
                              params.get('id'),])
             data = self.cur.fetchone()
             if data:
@@ -233,7 +233,7 @@ class VMDaemon(object):
 
         elif command == "resume":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            self.cur.execute("SELECT vmdaemon_db.openstack_uuid FROM instances WHERE user_id=%s", [
+            self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=%s", [
                              params.get('id'),])
             data = self.cur.fetchone()
             if data:
@@ -274,7 +274,7 @@ class VMDaemon(object):
                     params.get('request_id')))
                 # self.cur.execute("UPDATE queue SET on_process=0 WHERE id=?", [rid,])
                 self.cur.execute(
-                    "UPDATE vmdaemon_db.queue SET on_process=0 WHERE id=%s", [rid,])
+                    "UPDATE queue SET on_process=0 WHERE id=%s", [rid,])
 
                 self.conn.commit()
                 return None
@@ -294,32 +294,32 @@ class VMDaemon(object):
                 # self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?",
                 #         [json.dumps(instance), response_for_bill, rid]
                 #     )
-                self.cur.execute("UPDATE vmdaemon_db.queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
+                self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
                                  [json.dumps(instance), response_for_bill, rid]
                                  )
                 # self.cur.execute("""
                 #         UPDATE instances SET params=? WHERE openstack_uuid=?
                 #     """, [json.dumps(instance), instance.get('id')])
                 self.cur.execute("""
-                        UPDATE vmdaemon_db.instances SET params=%s WHERE openstack_uuid=%s
+                        UPDATE instances SET params=%s WHERE openstack_uuid=%s
                     """, [json.dumps(instance), instance.get('id')])
                 self.conn.commit()
             elif instance_status == 'ERROR':
                 # is_retry = bool(self.cur.execute("SELECT is_retry FROM queue WHERE id=?", [rid,]).fetchone()[0])
                 self.cur.execute(
-                    "SELECT is_retry FROM vmdaemon_db.queue WHERE id=%s", [rid,])
+                    "SELECT is_retry FROM queue WHERE id=%s", [rid,])
                 is_retry = bool(self.cur.fetchone()[0])
                 if is_retry:
                     self.delete_instance(instance_id)
                     response_for_bill = "ERROR instance creation is broken"
                     # self.cur.execute("UPDATE queue SET response=? WHERE id=?", [response_for_bill, rid])
-                    self.cur.execute("UPDATE vmdaemon_db.queue SET response=? WHERE id=%s", [
+                    self.cur.execute("UPDATE queue SET response=? WHERE id=%s", [
                                      response_for_bill, rid])
 
                 else:
                     # self.cur.execute("UPDATE queue SET is_retry=1 WHERE id=?", [rid,])
                     self.cur.execute(
-                        "UPDATE vmdaemon_db.queue SET is_retry=1 WHERE id=%s", [rid,])
+                        "UPDATE queue SET is_retry=1 WHERE id=%s", [rid,])
                     logging.info(
                         "Set queue task {0} param to recreate instance".format(rid))
                 self.conn.commit()
@@ -340,7 +340,7 @@ class VMDaemon(object):
             result = json.dumps({"status": "DONE"})
             response_for_bill = "OK"
 #            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?",
-            self.cur.execute("UPDATE vmdaemon_db.queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
                              [result, response_for_bill, rid]
                              )
             self.conn.commit()
@@ -350,7 +350,7 @@ class VMDaemon(object):
             result = json.dumps({"status": "DONE"})
             response_for_bill = "OK"
 #            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?",
-            self.cur.execute("UPDATE vmdaemon_db.queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
                              [result, response_for_bill, rid]
                              )
             self.conn.commit()
@@ -360,7 +360,7 @@ class VMDaemon(object):
             result = json.dumps({"status": "DONE"})
             response_for_bill = "OK"
 #            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?",
-            self.cur.execute("UPDATE vmdaemon_db.queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
+            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=%s, response=%s WHERE id=%s",
                              [result, response_for_bill, rid]
                              )
             self.conn.commit()
