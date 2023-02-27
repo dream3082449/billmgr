@@ -123,8 +123,8 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS `os_images` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `created` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
     `openstack_uuid` UUID,
-    `project` TEXT DEFAULT NULL,
-    `params` TEXT DEFAULT NULL,
+    `openstack_uuid` TEXT DEFAULT NULL,
+    `billing_name` TEXT DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX (openstack_uuid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;""")
