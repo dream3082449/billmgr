@@ -118,11 +118,11 @@ class VMDaemon(object):
         if command == "open":
             os_image_id = self.check_image_by_name(params.get('ostempl'))
             if not os_image_id:
-                msg = "OS image not found for Instance {0} is ".format(params.get('user'))
+                msg = "ERROR: OS image not found for Instance {0} is ".format(params.get('user'))
                 self.cur.execute("UPDATE queue SET response=%s, is_done=1, on_process=0 WHERE id=%s", [
                              msg, rid])
                 self.conn.commit()
-                logging.error(msg)
+                logging.info(msg)
                 return None
             product_id = params.get('user').strip('user')
             user_id, username, email = self.helper.product_id_to_username(
@@ -273,7 +273,7 @@ class VMDaemon(object):
         if command == "open":
             res = json.loads(result)
             if not res:
-                logging.error('Error on request_id={0} : no result found. restart task'.format(
+                logging.info('Error on request_id={0} : no result found. restart task'.format(
                     params.get('request_id')))
                 # self.cur.execute("UPDATE queue SET on_process=0 WHERE id=?", [rid,])
                 self.cur.execute(
@@ -327,7 +327,7 @@ class VMDaemon(object):
                         "Set queue task {0} param to recreate instance".format(rid))
                 self.conn.commit()
 
-                logging.error("Instance {0} have status {1}. Try to recreate it".format(
+                logging.info("Instance {0} have status {1}. Try to recreate it".format(
                     instance_id, instance_status))
 
                 self.delete_instance(instance_id)
