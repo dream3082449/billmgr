@@ -1,10 +1,9 @@
 #! /bin/env python3
 import sys
 import json
-# import sqlite3
+import configparser
 import uuid
 import MySQLdb
-import config
 
 path = "/".join([os.getcwd(),"settings.ini"])
 config = configparser.ConfigParser()

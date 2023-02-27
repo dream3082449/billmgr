@@ -1,12 +1,9 @@
 #! /bin/env python3
-import sys
-import json
-import time
-# import sqlite3
+import sys, json, time
+import configparser
 import MySQLdb
 import uuid
 import logging
-import config
 
 path = "/etc/vm_daemon/settings.ini"
 config = configparser.ConfigParser()
