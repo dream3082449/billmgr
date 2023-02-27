@@ -439,7 +439,7 @@ def start_daemon(pidf, logf, config):
         umask=0o002,
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
         detach_process = True,
-#        stderr=logf,
+        stderr=sys.stderr,
         )
     with context:
         runner(logf, config)
