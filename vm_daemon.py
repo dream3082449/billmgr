@@ -433,7 +433,7 @@ def start_daemon(pidf, logf, config):
 
     ### XXX pidfile is a context
     with daemon.DaemonContext(
-        working_directory=config.get("VMDaemon", "base_path"),
+        working_directory=config.get("defaults", "base_path"),
         umask=0o002,
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
         stderr=logf,
