@@ -39,7 +39,7 @@ cursor = conn.cursor()
 #     is_retry INTEGER DEFAULT 0);""")
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS `queue` (
-    `id` INT(11) NOT NULL,
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
     `request_id` UUID,
     `created` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
     `on_process` INT(11) DEFAULT 0,
