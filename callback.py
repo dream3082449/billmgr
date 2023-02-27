@@ -8,11 +8,11 @@ import uuid
 import logging
 import config
 
-path = "/".join([os.getcwd(),"settings.ini"])
+path = "/etc/vm_daemon/settings.ini"
 config = configparser.ConfigParser()
 config.read(path)
 
-LOGFILE = './callback.log'
+LOGFILE = config.get("defaults", "log_file")
 DEBUG = True
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)

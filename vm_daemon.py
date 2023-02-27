@@ -20,7 +20,7 @@ def createConfig():
 
         config.add_section('defaults')
         config.set("defaults","base_path", "/opt/billmgr")
-        config.set("defaults","log_file", '/var/run/vm_daemon.log')
+        config.set("defaults","log_file", '/var/log/vm_daemon.log')
         config.set("defaults","pid_file", '/var/run/vm_daemon.pid')
 
         config.add_section("MainDB")
