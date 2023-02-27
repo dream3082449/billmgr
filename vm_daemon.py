@@ -13,11 +13,11 @@ debug_p = True
 
 def createConfig():
     sys_path = Path("/etc/vm_daemon/settings.ini")
+    config = configparser.ConfigParser()
 
     if not sys_path.exists(sys_path):
         sys_path.parent.mkdir(exist_ok=True, parents=True)
 
-        config = configparser.ConfigParser()
         config.add_section('defaults')
         config.set("defaults","base_path", "/opt/billmgr")
 
@@ -36,6 +36,8 @@ def createConfig():
         config.set("BillingDB", "db_name", "billmgr")
         
         config.write(sys_path.open('w'))
+    else:
+        config.read(sys_path)
 
     return config
 
