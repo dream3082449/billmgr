@@ -435,10 +435,11 @@ def start_daemon(pidf, logf, config):
 
     
     context = daemon.DaemonContext(
-#        working_directory=config.get("defaults", "base_path"),
+        working_directory=config.get("defaults", "base_path"),
         umask=0o002,
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
-        stderr=logf,
+        detach_process = True,
+#        stderr=logf,
         )
     with context:
         runner(logf, config)
