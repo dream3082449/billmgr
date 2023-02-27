@@ -20,7 +20,7 @@ class oops_helper(object):
         )
         self.mysql_cursor = self.mysql_conn.cursor()
         # Initialize connection
-        conn = openstack.connect(cloud='openstack')
+        self.conn = openstack.connect(cloud='openstack')
     
 
     def product_id_to_username(self, product_id, username_only=False):
