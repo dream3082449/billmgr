@@ -20,6 +20,8 @@ def createConfig():
 
         config.add_section('defaults')
         config.set("defaults","base_path", "/opt/billmgr")
+        config.set("defaults","log_file", '/var/run/vm_daemon.log')
+        config.set("defaults","pid_file", '/var/run/vm_daemon.pid')
 
         config.add_section("MainDB")
         config.set("MainDB", "host", "10.8.12.137")
@@ -441,11 +443,12 @@ def start_daemon(pidf, logf, config):
         runner(logf, config)
 
 if __name__ == "__main__":
+    config = createConfig()
+
     parser = argparse.ArgumentParser(description="BillManager to OpenStack integration daemon")
-    parser.add_argument('-p', '--pid-file', default='/var/run/vm_daemon.pid')
-    parser.add_argument('-l', '--log-file', default='/var/log/vm_daemon.log')
+    parser.add_argument('-p', '--pid-file', default=config.get("defaults", "pid_file"))
+    parser.add_argument('-l', '--log-file', default=config.get("defaults", "log_file"))
 
     args = parser.parse_args()    
-    config = createConfig()
     
     start_daemon(pidf=args.pid_file, logf=args.log_file, config=config)
