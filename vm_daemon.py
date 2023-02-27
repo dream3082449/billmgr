@@ -5,7 +5,6 @@ import logging
 import configparser
 from pathlib import Path
 import daemon
-from daemon import pidfile
 import MySQLdb
 from oops import oops_helper
 
@@ -433,13 +432,14 @@ def start_daemon(pidf, logf, config):
         print("vm_daemon: pidf = {}    logf = {}".format(pidf, logf))
         print("vm_daemon: about to start daemonization")
 
-    ### XXX pidfile is a context
-    with daemon.DaemonContext(
-        working_directory=config.get("defaults", "base_path"),
+    
+    context = daemon.DaemonContext(
+#        working_directory=config.get("defaults", "base_path"),
         umask=0o002,
-        pidfile=pidfile.TimeoutPIDLockFile(pidf),
+        pidfile=daemon.pidfile.TimeoutPIDLockFile(pidf),
         stderr=logf,
-        ) as context:
+        )
+    with context:
         runner(logf, config)
 
 if __name__ == "__main__":
