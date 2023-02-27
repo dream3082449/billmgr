@@ -5,7 +5,7 @@ import configparser
 import uuid
 import MySQLdb
 
-path = "/".join([os.getcwd(),"settings.ini"])
+path = "/etc/vm_daemon/settings.ini"
 config = configparser.ConfigParser()
 config.read(path)
 
