@@ -118,7 +118,7 @@ class VMDaemon(object):
         if command == "open":
             os_image_id = self.check_image_by_name(params.get('ostempl'))
             if not os_image_id:
-                msg = "ERROR: OS image not found for Instance {0} is ".format(params.get('user'))
+                msg = "ERROR: OS image not found for user request {0}".format(params.get('user'))
                 self.cur.execute("UPDATE queue SET response=%s, is_done=1, on_process=0 WHERE id=%s", [
                              msg, rid])
                 self.conn.commit()
