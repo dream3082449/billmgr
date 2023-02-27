@@ -36,7 +36,8 @@ conn = MySQLdb.connect(
             user=config.get('MainDB', 'user'),
             password=config.get('MainDB', 'password'),
             db=config.get('MainDB', 'db_name')
-        )cursor = conn.cursor()
+        )
+cursor = conn.cursor()
 
 logging.info("Run callback with request_id={0}".format(params['request_id']))
 
