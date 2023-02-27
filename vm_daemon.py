@@ -15,7 +15,7 @@ def createConfig():
     sys_path = Path("/etc/vm_daemon/settings.ini")
     config = configparser.ConfigParser()
 
-    if not sys_path.exists(sys_path):
+    if not sys_path.exists():
         sys_path.parent.mkdir(exist_ok=True, parents=True)
 
         config.add_section('defaults')
