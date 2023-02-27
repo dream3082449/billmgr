@@ -446,6 +446,6 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--log-file', default='/var/log/vm_daemon.log')
 
     args = parser.parse_args()    
-    config = createConfig(path)
+    config = createConfig()
     
     start_daemon(pidf=args.pid_file, logf=args.log_file, config=config)
