@@ -118,8 +118,10 @@ class VMDaemon(object):
         if command == "open":
             os_image_id = self.check_image_by_name(params.get('ostempl'))
             if not os_image_id:
-                logging.error(
-                    "OS image not found for Instance {0} is ".format(params.get('user')))
+                msg = "OS image not found for Instance {0} is ".format(params.get('user'))
+                self.cur.execute("UPDATE queue SET response=%s, is_done=1, on_process=0 WHERE id=%s", [
+                             msg, rid])
+                logging.error(msg)
                 return None
             product_id = params.get('user').strip('user')
             user_id, username, email = self.helper.product_id_to_username(
