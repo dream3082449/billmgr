@@ -1,0 +1,8 @@
+[Unit]
+Description=VM Daemon
+
+[Service]
+ExecStart=/bin/env python3 /opt/billmgr/vm_daemon.py
+
+[Install]
+WantedBy=multi-user.target

@@ -15,6 +15,9 @@ def createConfig(path):
         return None
 
     config = configparser.ConfigParser()
+    config.add_section('VMDaemon')
+    config.set("VMDaemon","base_path", "/opt/billmgr")
+
     config.add_section("MainDB")
     config.set("MainDB", "host", "10.8.12.137")
     config.set("MainDB", "port", "3306")
@@ -425,7 +428,7 @@ def start_daemon(pidf, logf, config):
 
     ### XXX pidfile is a context
     with daemon.DaemonContext(
-        working_directory=os.getcwd(),
+        working_directory=config.get("VMDaemon", "base_path"),
         umask=0o002,
         pidfile=pidfile.TimeoutPIDLockFile(pidf),
         stderr=logf,
@@ -439,7 +442,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    path = "/".join([os.getcwd(),"settings.ini"])
+    path = "/".join([config.get("VMDaemon", "base_path"),"settings.ini"])
     createConfig(path)
     config = configparser.ConfigParser()
     config.read(path)
