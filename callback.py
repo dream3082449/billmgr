@@ -53,7 +53,7 @@ while True:
     data = cursor.fetchone()
     conn.commit()
     if data:
-        logger.info('Successful response to billing: '.format(data[0]))
+        logger.info('Successful response to billing -- {0}'.format(data[0]))
         print(data[0])
         break
     time.sleep(5)
