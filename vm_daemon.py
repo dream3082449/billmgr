@@ -121,6 +121,7 @@ class VMDaemon(object):
                 msg = "OS image not found for Instance {0} is ".format(params.get('user'))
                 self.cur.execute("UPDATE queue SET response=%s, is_done=1, on_process=0 WHERE id=%s", [
                              msg, rid])
+                self.conn.commit()
                 logging.error(msg)
                 return None
             product_id = params.get('user').strip('user')
@@ -406,13 +407,12 @@ class VMDaemon(object):
 
 
 def runner(logf, config):
-    ### This does the "work" of the daemon
 
     logger = logging.getLogger('vm_daemon')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     fh = logging.FileHandler(logf)
-    fh.setLevel(logging.INFO)
+    fh.setLevel(logging.DEBUG)
 
     formatstr = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     formatter = logging.Formatter(formatstr)
