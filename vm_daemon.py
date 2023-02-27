@@ -378,7 +378,7 @@ class VMDaemon(object):
     def prepare_data(self, data, set_on_process=False):
         rid = data[0]
         if set_on_process:
-            self.cur.execute("UPDATE queue SET on_process=1 where id=?", [rid])
+            self.cur.execute("UPDATE queue SET on_process=1 where id=%s", [rid])
         r = json.loads(data[1])
         c = r.pop('commandfile')
         result = data[2] if data[2] else '{}'
