@@ -3,6 +3,7 @@ import sys, os, time
 import argparse
 import logging
 import configparser
+from pathlib import Path
 import daemon
 from daemon import pidfile
 import MySQLdb
@@ -10,31 +11,33 @@ from oops import oops_helper
 
 debug_p = True
 
-def createConfig(path):
-    if  os.path.exists(path):
-        return None
+def createConfig():
+    sys_path = Path("/etc/vm_daemon/settings.ini")
 
-    config = configparser.ConfigParser()
-    config.add_section('VMDaemon')
-    config.set("VMDaemon","base_path", "/opt/billmgr")
+    if not sys_path.exists(sys_path):
+        sys_path.parent.mkdir(exist_ok=True, parents=True)
 
-    config.add_section("MainDB")
-    config.set("MainDB", "host", "10.8.12.137")
-    config.set("MainDB", "port", "3306")
-    config.set("MainDB", "user", "daemon")
-    config.set("MainDB", "password", "M27h_w59Y$qD13")
-    config.set("MainDB", "db_name", "vmdaemon_db")
+        config = configparser.ConfigParser()
+        config.add_section('defaults')
+        config.set("defaults","base_path", "/opt/billmgr")
 
-    config.add_section("BillingDB")
-    config.set("BillingDB", "host", "10.8.12.186")
-    config.set("BillingDB", "port", "3306")
-    config.set("BillingDB", "user", "os_user")
-    config.set("BillingDB", "password", "dtpe,kbq")
-    config.set("BillingDB", "db_name", "billmgr")
-    
-    with open(path, "w") as config_file:
-        config.write(config_file)
+        config.add_section("MainDB")
+        config.set("MainDB", "host", "10.8.12.137")
+        config.set("MainDB", "port", "3306")
+        config.set("MainDB", "user", "daemon")
+        config.set("MainDB", "password", "M27h_w59Y$qD13")
+        config.set("MainDB", "db_name", "vmdaemon_db")
 
+        config.add_section("BillingDB")
+        config.set("BillingDB", "host", "10.8.12.186")
+        config.set("BillingDB", "port", "3306")
+        config.set("BillingDB", "user", "os_user")
+        config.set("BillingDB", "password", "dtpe,kbq")
+        config.set("BillingDB", "db_name", "billmgr")
+        
+        config.write(sys_path.open('w'))
+
+    return config
 
 class VMDaemon(object):
 
@@ -440,11 +443,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--pid-file', default='/var/run/vm_daemon.pid')
     parser.add_argument('-l', '--log-file', default='/var/log/vm_daemon.log')
 
-    args = parser.parse_args()
-
-    path = "/".join([config.get("VMDaemon", "base_path"),"settings.ini"])
-    createConfig(path)
-    config = configparser.ConfigParser()
-    config.read(path)
+    args = parser.parse_args()    
+    config = createConfig(path)
     
     start_daemon(pidf=args.pid_file, logf=args.log_file, config=config)
