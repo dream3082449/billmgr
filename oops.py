@@ -1,26 +1,27 @@
 #!env python3
 import sys
 import openstack
-import MySQLdb  
+import MySQLdb
 
 
 openstack.enable_logging(True, stream=sys.stdout)
 
+
 class oops_helper(object):
 
-    mysql_params = {
-        "host": "10.8.12.186",
-        "port": 3306,
-        "user": "os_user",
-        "passwd": "dtpe,kbq",
-        "db": "billmgr"
-    }
-
-    mysql_conn = MySQLdb.connect(**mysql_params)
-    mysql_cursor = mysql_conn.cursor()
-
-    # Initialize connection
-    conn = openstack.connect(cloud='openstack')
+    def __init__(self, config):
+        self.config = config
+        self.mysql_conn = MySQLdb.connect(
+            host=config.get('BillingDB', 'host'),
+            port=int(config.get('BillingDB', 'port')),
+            user=config.get('BillingDB', 'user'),
+            password=config.get('BillingDB', 'password'),
+            db=config.get('BillingDB', 'db_name')
+        )
+        self.mysql_cursor = self.mysql_conn.cursor()
+        # Initialize connection
+        self.conn = openstack.connect(cloud='openstack')
+    
 
     def product_id_to_username(self, product_id, username_only=False):
         query = """SELECT i.account as id, u.email FROM item i LEFT JOIN user u on i.account=u.account WHERE i.id =%s"""
@@ -37,21 +38,19 @@ class oops_helper(object):
         else:
             return (user_id, username, email)
 
-
     def get_or_create_user(self, username, password, project_id, email):
         response = self.conn.identity.find_user(username, ignore_missing=True)
         if response:
             return response
         else:
             attrs = {
-                'name':username,
-                'password':password,
+                'name': username,
+                'password': password,
                 'default_project_id': project_id,
                 'email': email,
                 'is_enabled': True
-                }
+            }
             return self.conn.identity.create_user(**attrs)
-
 
     def get_or_create_project(self, project_name):
         resp = self.conn.identity.find_project(project_name)
@@ -59,8 +58,8 @@ class oops_helper(object):
             return resp
         else:
             attrs = {
-            'domain_id':'default',
-            'name': project_name
+                'domain_id': 'default',
+                'name': project_name
             }
             return self.conn.create_project(**attrs)
 
@@ -78,7 +77,8 @@ class oops_helper(object):
         else:
             cores = current_quotas.get('cores', 0) + params.get('cores')
 
-        new_ram = params.get('ram') * 1024 # bump Gigabytes to megabytes for OpenStack cli
+        # bump Gigabytes to megabytes for OpenStack cli
+        new_ram = params.get('ram') * 1024
 
         if current_quotas.get('ram', 0) < new_ram:
             ram = new_ram
@@ -106,17 +106,17 @@ class oops_helper(object):
 
     def create_instance(self, project, params):
         p = {"name": params.get("instance_name"),
-            "image_id": params.get("os_image_id"),
-            "flavor_id": params.get("flavor_id"),
-            "disk_config": "AUTO",
-            "admin_password": params.get("password"),
-            "metadata": {
-                "Server_Name" : params.get("meta_name"),
-            },
+             "image_id": params.get("os_image_id"),
+             "flavor_id": params.get("flavor_id"),
+             "disk_config": "AUTO",
+             "admin_password": params.get("password"),
+             "metadata": {
+            "Server_Name": params.get("meta_name"),
+        },
             "networks": "auto",
-            }
-        
-        #logic for creating instance in project with hive gpu
+        }
+
+        # logic for creating instance in project with hive gpu
         return self.conn.compute.create_server(**p)
 
     def get_instance_status(self, instance_id):
@@ -126,9 +126,9 @@ class oops_helper(object):
         ii = self.conn.compute.find_server(instance_id)
         if ii:
             instance = ii.to_dict()
-            ## ACTIVE, BUILDING, DELETED, ERROR, HARD_REBOOT, PASSWORD, 
-            ## PAUSED, REBOOT, REBUILD, RESCUED, RESIZED, REVERT_RESIZE, 
-            ## SHUTOFF, SOFT_DELETED, STOPPED, SUSPENDED, UNKNOWN, or VERIFY_RESIZE
+            # ACTIVE, BUILDING, DELETED, ERROR, HARD_REBOOT, PASSWORD,
+            # PAUSED, REBOOT, REBUILD, RESCUED, RESIZED, REVERT_RESIZE,
+            # SHUTOFF, SOFT_DELETED, STOPPED, SUSPENDED, UNKNOWN, or VERIFY_RESIZE
             return instance.get('status'), instance
         else:
             return None, None
@@ -144,5 +144,3 @@ class oops_helper(object):
     def suspend_instance(self, instance_id):
         self.conn.compute.suspend_server(instance_id)
         return True
-
-
