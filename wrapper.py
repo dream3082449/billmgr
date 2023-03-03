@@ -102,7 +102,7 @@ conn.commit()
 cursor.execute("""CREATE TABLE IF NOT EXISTS `instances` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `created` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
-    `user_id` INT(11) DEFAULT 0,
+    `bill_service_id` VARCHAR(12) DEFAULT NULL,
     `openstack_uuid` UUID,
     `project` TEXT DEFAULT NULL,
     `params` TEXT DEFAULT NULL,

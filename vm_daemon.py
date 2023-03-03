@@ -221,7 +221,7 @@ class VMDaemon(object):
             #     INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
             # """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
             self.cur.execute("""
-                INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (%s, %s, %s, %s)
+                INSERT INTO instances (bill_service_id, openstack_uuid, project, params) VALUES (%s, %s, %s, %s)
             """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
             self.conn.commit()
             return j_instance
@@ -230,7 +230,7 @@ class VMDaemon(object):
 #            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
         elif command == "close":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=%s", [
+            self.cur.execute("SELECT openstack_uuid FROM instances WHERE bill_service_id=%s", [
                              params.get('id'),])
             data = self.cur.fetchone()
             if data:
