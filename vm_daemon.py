@@ -48,6 +48,8 @@ def createConfig():
         config.read(sys_path)
         #add new sections and options
         for section in config_default:
+            if section == 'DEFAULT':
+                continue
             if section not in config.sections():
                 config.add_section(section)
                 for option in config_default.options(section):
@@ -58,6 +60,8 @@ def createConfig():
                         config.set(section, option, config_default.get(section, option))
         #remove deprecated sections with options
         for section in config.sections():
+            if section == 'DEFAULT':
+                continue
             if section not in config_default.sections():
                 config.remove_section(section)
 
@@ -146,7 +150,7 @@ class VMDaemon(object):
                 logging.info(msg)
                 return None
 
-            
+
 
             product_id = params.get('user').strip('user')
             user_id, username, email = self.helper.product_id_to_username(
