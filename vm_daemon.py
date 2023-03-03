@@ -14,34 +14,49 @@ debug_p = True
 def createConfig():
     sys_path = Path("/etc/vm_daemon/settings.ini")
     config = configparser.ConfigParser()
+    config_default = configparser.ConfigParser()
+
+    config_default.add_section('defaults')
+    config_default.set("defaults","base_path", "/opt/billmgr")
+    config_default.set("defaults","log_file", '/var/log/vm_daemon.log')
+    config_default.set("defaults","pid_file", '/var/run/vm_daemon.pid')
+
+    config_default.add_section("MainDB")
+    config_default.set("MainDB", "host", "10.8.12.137")
+    config_default.set("MainDB", "port", "3306")
+    config_default.set("MainDB", "user", "daemon")
+    config_default.set("MainDB", "password", "M27h_w59Y$qD13")
+    config_default.set("MainDB", "db_name", "vmdaemon_db")
+
+    config_default.add_section("BillingDB")
+    config_default.set("BillingDB", "host", "10.8.12.186")
+    confconfig_defaultig_null.set("BillingDB", "port", "3306")
+    config_default.set("BillingDB", "user", "os_user")
+    config_default.set("BillingDB", "password", "dtpe,kbq")
+    config_default.set("BillingDB", "db_name", "billmgr")
+
+    config_default.add_section('openstack')
+    config_default.set("openstack","use_network", "private")
+    config_default.set("openstack","vgpu1080", "0-1080Ti:1,1-1080Ti:1")
+    config_default.set("openstack","vgpu1050", "0-1050Ti:1,1-1050Ti:1")
 
     if not sys_path.exists():
         sys_path.parent.mkdir(exist_ok=True, parents=True)
-
-        config.add_section('defaults')
-        config.set("defaults","base_path", "/opt/billmgr")
-        config.set("defaults","log_file", '/var/log/vm_daemon.log')
-        config.set("defaults","pid_file", '/var/run/vm_daemon.pid')
-
-        config.add_section("MainDB")
-        config.set("MainDB", "host", "10.8.12.137")
-        config.set("MainDB", "port", "3306")
-        config.set("MainDB", "user", "daemon")
-        config.set("MainDB", "password", "M27h_w59Y$qD13")
-        config.set("MainDB", "db_name", "vmdaemon_db")
-
-        config.add_section("BillingDB")
-        config.set("BillingDB", "host", "10.8.12.186")
-        config.set("BillingDB", "port", "3306")
-        config.set("BillingDB", "user", "os_user")
-        config.set("BillingDB", "password", "dtpe,kbq")
-        config.set("BillingDB", "db_name", "billmgr")
-        
-        config.write(sys_path.open('w'))
+        config_default.write(sys_path.open('w'))
+        return config_default
     else:
         config.read(sys_path)
-
-    return config
+        for section in config_default:
+            if section not in config.sections():
+                config.add_section(section)
+                for option in config_default.options(section):
+                    config.set(section, option, config_default.get(section, option))
+            else:
+                for option in config_default.options(section):
+                    if option not in config.options(section):
+                        config.set(section, option, config_default.get(section, option))
+        config.write(sys_path.open('w'))
+        return config
 
 class VMDaemon(object):
 
