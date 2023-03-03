@@ -113,7 +113,7 @@ class oops_helper(object):
              "metadata": {
                 "Server_Name": params.get("meta_name"),
                 },
-            "networks": self.config.get('openstack', 'use_network'),
+            "networks": [self.config.get('openstack', 'use_network'),],
         }
 
         # logic for creating instance in project with hive gpu
