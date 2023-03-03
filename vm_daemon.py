@@ -46,6 +46,7 @@ def createConfig():
         return config_default
     else:
         config.read(sys_path)
+        #add new sections and options
         for section in config_default:
             if section not in config.sections():
                 config.add_section(section)
@@ -55,6 +56,11 @@ def createConfig():
                 for option in config_default.options(section):
                     if option not in config.options(section):
                         config.set(section, option, config_default.get(section, option))
+        #remove deprecated sections with options
+        for section in config.sections():
+            if section not in config_default.sections():
+                config.remove_section(section)
+
         config.write(sys_path.open('w'))
         return config
 
