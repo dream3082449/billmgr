@@ -105,6 +105,7 @@ class oops_helper(object):
         return [(i.id, i.name, i.created_at) for i in sorted(self.conn.list_images(), key=lambda d:d['created_at'])]
 
     def create_instance(self, project, params):
+        network = self.conn.network.find_network(self.config.get('openstack', 'use_network'))
         p = {"name": params.get("instance_name"),
              "image_id": params.get("os_image_id"),
              "flavor_id": params.get("flavor_id"),
@@ -113,7 +114,7 @@ class oops_helper(object):
              "metadata": {
                 "Server_Name": params.get("meta_name"),
                 },
-            "networks": [self.config.get('openstack', 'use_network'),],
+            "networks": network,
         }
 
         # logic for creating instance in project with hive gpu
