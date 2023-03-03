@@ -30,7 +30,7 @@ def createConfig():
 
     config_default.add_section("BillingDB")
     config_default.set("BillingDB", "host", "10.8.12.186")
-    confconfig_defaultig_null.set("BillingDB", "port", "3306")
+    config_default.set("BillingDB", "port", "3306")
     config_default.set("BillingDB", "user", "os_user")
     config_default.set("BillingDB", "password", "dtpe,kbq")
     config_default.set("BillingDB", "db_name", "billmgr")
@@ -145,6 +145,9 @@ class VMDaemon(object):
                 self.conn.commit()
                 logging.info(msg)
                 return None
+
+            
+
             product_id = params.get('user').strip('user')
             user_id, username, email = self.helper.product_id_to_username(
                 product_id)
