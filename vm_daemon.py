@@ -319,7 +319,7 @@ class VMDaemon(object):
                     params.get('user'),
                     params.get('user'),
                     params.get('password'),
-                    instance['addresses']['provider'][0]['addr'],
+                    instance['addresses'][self.config.get('openstack', 'use_network')][0]['addr'],
                     'root'
                 )
                 # self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?",
