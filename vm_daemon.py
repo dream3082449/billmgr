@@ -37,8 +37,8 @@ def createConfig():
 
     config_default.add_section('openstack')
     config_default.set("openstack","use_network", "private")
-    config_default.set("openstack","vgpu1080", "0-1080Ti:1,1-1080Ti:1")
-    config_default.set("openstack","vgpu1050", "0-1050Ti:1,1-1050Ti:1")
+    config_default.set("openstack","vgpu1080", "1080Ti")
+    config_default.set("openstack","vgpu1050", "1050Ti")
 
     if not sys_path.exists():
         sys_path.parent.mkdir(exist_ok=True, parents=True)
@@ -150,7 +150,25 @@ class VMDaemon(object):
                 logging.info(msg)
                 return None
 
+            #get vgpu parameters from billing request
+            vgpus = list()
+            for i in params.keys():
+                n = params.get(i)
+                if i.startswith('vgpu') and n == 'on' and i in config.options('openstack'):
+                    vgpus.append(i)
+                    #add audio line
+                    vgpus.append(i)
 
+            # check gpu availability in config
+            gpu_extra_list = list()
+            for cnt, i in enumerate(vgpus):
+                sname = config.get('openstack', i)
+                gpu_extra_list.append("{0}-{1}:1".format(cnt,sname,))
+
+            gpu_extra_str = ","join(gpu_extra_list)
+
+            msg = "Billing request instance with {0}".format(", ".join(vgpus))
+            logging.info(msg)
 
             product_id = params.get('user').strip('user')
             user_id, username, email = self.helper.product_id_to_username(
@@ -188,6 +206,7 @@ class VMDaemon(object):
                 "disk": int(params.get('hdd', 0)),
                 "vcpus": int(params.get('cpu', 1)),
                 "is_public": False,
+                "extra_specs": {'pci_passthrough:alias': gpu_extra_str}
             }
 
             flavor = self.helper.create_flavor(project, flavor_params)
