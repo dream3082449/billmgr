@@ -165,7 +165,7 @@ class VMDaemon(object):
                 sname = config.get('openstack', i)
                 gpu_extra_list.append("{0}-{1}:1".format(cnt,sname,))
 
-            gpu_extra_str = ","join(gpu_extra_list)
+            gpu_extra_str = ",".join(gpu_extra_list)
 
             msg = "Billing request instance with {0}".format(", ".join(vgpus))
             logging.info(msg)
