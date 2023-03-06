@@ -204,9 +204,9 @@ class VMDaemon(object):
             flavor_id = uuid.uuid1()
             flavor_params = {
                 "name": "{0}_flavor_{1}".format(project_name, flavor_id),
-                "ram": int(params.get('instance_ram', 0)),
-                "disk": int(params.get('instance_hdd', 0)),
-                "vcpus": int(params.get('instance_cpu', 1)),
+                "ram": int(params.get('instance_ram', 0)) or 1,
+                "disk": int(params.get('instance_hdd', 0)) or 1,
+                "vcpus": int(params.get('instance_cpu', 1)) or 1,
                 "is_public": False,
             }
 
