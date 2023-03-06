@@ -359,8 +359,7 @@ class VMDaemon(object):
                 if is_retry:
                     self.delete_instance(instance_id)
                     response_for_bill = "ERROR instance creation is broken"
-                    # self.cur.execute("UPDATE queue SET response=? WHERE id=?", [response_for_bill, rid])
-                    self.cur.execute("UPDATE queue SET response=? WHERE id=%s", [
+                    self.cur.execute("UPDATE queue SET response=%s WHERE id=%s", [
                                      response_for_bill, rid])
 
                 else:
