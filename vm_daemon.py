@@ -263,9 +263,7 @@ class VMDaemon(object):
             return None
 
         elif command == "suspend":
-            # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=%s", [
-                             params.get('id'),])
+            self.cur.execute("SELECT openstack_uuid FROM instances WHERE bill_service_id=%s", [params.get('id'),])
             data = self.cur.fetchone()
             if data:
                 i_status, _ = self.helper.get_instance_status(data[0])
