@@ -47,7 +47,7 @@ while True:
     #         [params['request_id']]
     #        ).fetchone()
     cursor.execute(
-        """SELECT response FROM vmdaemon_db.queue WHERE request_id=(%s) AND is_done=1 AND on_process=0;""",
+        """SELECT response FROM vmdaemon_db.queue WHERE request_id=(%s) AND is_done=TRUE AND on_process=FALSE;""",
         [params['request_id']]
     )
     data = cursor.fetchone()
