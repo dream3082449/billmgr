@@ -166,6 +166,8 @@ class VMDaemon(object):
                 gpu_extra_list.append("{0}-{1}:1".format(cnt,sname,))
 
             gpu_extra_str = ",".join(gpu_extra_list)
+            flavor_extra_specs = {'pci_passthrough:alias': gpu_extra_str}
+
 
             msg = "Billing request instance with {0}".format(", ".join(vgpus))
             logging.info(msg)
@@ -192,9 +194,9 @@ class VMDaemon(object):
             user = self.helper.get_or_create_user(**attrs)
 
             quotas_dict = {
-                "cores": int(params.get('cpu', 0)),
-                "hdd": int(params.get('hdd', 0)),
-                "ram": int(params.get('ram', 0)),
+                "cores": int(params.get('instance_cpu', 0)),
+                "hdd": int(params.get('instance_hdd', 0)),
+                "ram": int(params.get('instance_ram', 0)),
             }
 
             self.helper.update_project_quotas(project, quotas_dict)
@@ -202,21 +204,21 @@ class VMDaemon(object):
             flavor_id = uuid.uuid1()
             flavor_params = {
                 "name": "{0}_flavor_{1}".format(project_name, flavor_id),
-                "ram": int(params.get('ram', 0)),
-                "disk": int(params.get('hdd', 0)),
-                "vcpus": int(params.get('cpu', 1)),
+                "ram": int(params.get('instance_ram', 0)),
+                "disk": int(params.get('instance_hdd', 0)),
+                "vcpus": int(params.get('instance_cpu', 1)),
                 "is_public": False,
-                "extra_specs": {'pci_passthrough:alias': gpu_extra_str}
             }
 
             flavor = self.helper.create_flavor(project, flavor_params)
-            # self.cur.execute("""
-            #     INSERT INTO flavors (project_id, flavor_id) VALUES (?, ?);
-            # """, [project.get('id'), flavor.get('id')])
+            
             self.cur.execute("""
                 INSERT INTO flavors (project_id, flavor_id) VALUES (%s, %s); 
             """, [project.get('id'), flavor.get('id')])
             self.conn.commit()
+            if gpu_extra_str:
+                self.helper.create_flavor_extra_specs(flavor, flavor_extra_specs)
+
 
             instance_params = {
                 "os_image_id": os_image_id,
@@ -233,20 +235,17 @@ class VMDaemon(object):
 
             logging.info("Instance {0} is CREATED".format(instance.get('id')))
 
-            # self.cur.execute("UPDATE queue SET result=? WHERE id=?", [j_instance, rid])
-            self.cur.execute("UPDATE queue SET result=%s WHERE id=%s", [
-                             j_instance, rid])
-            # self.cur.execute("""
-            #     INSERT INTO instances (user_id, openstack_uuid, project, params) VALUES (?, ?, ?, ?)
-            # """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
+            self.cur.execute("UPDATE queue SET result=%s WHERE id=%s", [j_instance, rid])
+
             self.cur.execute("""
                 INSERT INTO instances (bill_service_id, openstack_uuid, project, params) VALUES (%s, %s, %s, %s)
             """, [params.get('user'), instance.get('id'), project.get('id'), j_instance])
             self.conn.commit()
+
             return j_instance
 
-#            ssh command '/opt/billmgr/open.sh --cpu=2 --hdd=20 --ippool=1 --ostempl=ubuntu-base
-#            --password=aCEtOf6oLuPz --ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
+#            ssh command '/opt/billmgr/open.sh --instance_cpu=2 --instance_hdd=20 --ippool=1 --ostempl=ubuntu-base
+#            --password=aCEtOf6oLuPz --instance_ram=4 --user=user11384 --vgpu1080=off' on root@10.10.84.135
         elif command == "close":
             # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
             self.cur.execute("SELECT openstack_uuid FROM instances WHERE bill_service_id=%s", [

@@ -94,9 +94,12 @@ class oops_helper(object):
         return True
 
     def create_flavor(self, project, params):
-        flavor = self.conn.create_flavor(**params)
+        flavor = self.conn.compute.create_flavor(**params)
         self.conn.add_flavor_access(flavor.get('id'), project.get('id'))
         return flavor
+
+    def create_flavor_extra_specs(self, flavor, extra_specs):
+        return self.conn.compute.create_flavor_extra_specs(flavor, extra_specs)
 
     def get_free_hive_gpu(conn):
         pass
