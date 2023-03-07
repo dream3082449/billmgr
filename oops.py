@@ -92,7 +92,7 @@ class oops_helper(object):
 
     def create_flavor(self, project, params):
         flavor = self.conn.compute.create_flavor(**params)
-        self.conn.add_flavor_access(flavor.get('id'), project.get('id'))
+        self.conn.add_flavor_access(flavor.id, project.gid)
         return flavor
 
     def create_flavor_extra_specs(self, flavor, extra_specs):

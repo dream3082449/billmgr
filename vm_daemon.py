@@ -210,7 +210,7 @@ class VMDaemon(object):
             
             self.cur.execute("""
                 INSERT INTO flavors (project_id, flavor_id) VALUES (%s, %s); 
-            """, [project.get('id'), flavor.get('id')])
+            """, [project.get('id'), flavor.id])
             self.conn.commit()
             if gpu_extra_str:
                 self.helper.create_flavor_extra_specs(flavor, flavor_extra_specs)
@@ -439,7 +439,7 @@ class VMDaemon(object):
                 rid, command, params, result = self.prepare_data(row)
                 self.logger.info(f"%s %s" % (command, json.dumps(params)))
                 self.check_command_readiness(rid, command, params, result)
-                self.logger.info("Command %s is DONE with result %s" % (command, result))
+                
 
             #FOR DEBUG
             time.sleep(5)
