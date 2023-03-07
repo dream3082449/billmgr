@@ -25,13 +25,10 @@ class oops_helper(object):
 
     def product_id_to_username(self, product_id, username_only=False):
         query = """SELECT i.account as id, u.email FROM item i LEFT JOIN user u on i.account=u.account WHERE i.id =%s"""
-#        query = 'select u.account as id, u.name, a.email from item i left join account a on i.account=a.id where i.id = %s'
         self.mysql_cursor.execute(query, [product_id,])
-        try:
-            user_id, email = self.mysql_cursor.fetchone()
-            username = "user_{0}".format(user_id)
-        except Exception:
-            return None
+
+        user_id, email = self.mysql_cursor.fetchone()
+        username = "user_{0}".format(user_id)
 
         if username_only:
             return username
