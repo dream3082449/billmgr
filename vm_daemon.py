@@ -171,6 +171,12 @@ class VMDaemon(object):
             product_id = params.get('user').strip('user')
             user_id, username, email = self.helper.product_id_to_username(
                 product_id)
+            if not user_id:
+                msg = "ERROR: user not found for {0}".format(params.get('user'))
+                logging.warning(msg)
+                self.cur.execute("UPDATE queue SET response=%s, is_done=TRUE, on_process=FALSE WHERE id=%s", [msg, rid])
+                self.conn.commit()
+                return None
 
             project_name = '{0}_project'.format(username)
             instance_name = '{0}_{1}'.format(username, product_id)
