@@ -287,9 +287,7 @@ class VMDaemon(object):
             return None
 
         elif command == "resume":
-            # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
-            self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=%s", [
-                             params.get('id'),])
+            self.cur.execute("SELECT openstack_uuid FROM instances WHERE bill_service_id=%s", [params.get('id'),])
             data = self.cur.fetchone()
             self.conn.commit()
             if data:
