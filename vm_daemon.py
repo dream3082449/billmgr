@@ -253,14 +253,12 @@ class VMDaemon(object):
 
 
         elif command == "close":
-            # data = self.cur.execute("SELECT openstack_uuid FROM instances WHERE user_id=?", [params.get('id'),]).fetchone()
             self.cur.execute("SELECT openstack_uuid FROM instances WHERE bill_service_id=%s", [
                              params.get('id'),])
             data = self.cur.fetchone()
             self.conn.commit()
             if data:
                 self.delete_instance(data[0])
-                # self.cur.execute("DELETE from instances where openstack_uuid=?", [data[0]])
                 self.cur.execute(
                     "DELETE from instances where openstack_uuid=%s", [data[0]])
                 self.conn.commit()
@@ -352,7 +350,6 @@ class VMDaemon(object):
                     """, [json.dumps(instance), instance.get('id')])
                 self.conn.commit()
             elif instance_status == 'ERROR':
-                # is_retry = bool(self.cur.execute("SELECT is_retry FROM queue WHERE id=?", [rid,]).fetchone()[0])
                 self.cur.execute(
                     "SELECT is_retry FROM queue WHERE id=%s", [rid,])
                 is_retry = bool(self.cur.fetchone()[0])
@@ -364,7 +361,6 @@ class VMDaemon(object):
                                      response_for_bill, rid])
 
                 else:
-                    # self.cur.execute("UPDATE queue SET is_retry=1 WHERE id=?", [rid,])
                     self.cur.execute(
                         "UPDATE queue SET is_retry=TRUE WHERE id=%s", [rid,])
                     logging.info(
@@ -404,7 +400,6 @@ class VMDaemon(object):
         elif command == "suspend":
             result = json.dumps({"status": "DONE"})
             response_for_bill = "OK"
-#            self.cur.execute("UPDATE queue SET is_done=1, on_process=0, result=?, response=? WHERE id=?",
             self.cur.execute("UPDATE queue SET is_done=TRUE, on_process=FALSE, result=%s, response=%s WHERE id=%s",
                              [result, response_for_bill, rid]
                              )
