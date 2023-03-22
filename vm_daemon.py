@@ -279,11 +279,11 @@ class VMDaemon(object):
                     logging.warning("The instance status for product_id {0} is not 'active' , so it cannot be suspended".format(
                         params.get('user')))
                     return None
-                self.helper.suspend_instance(data[0])
-                logging.info("Instance {0} suspended".format(data[0]))
+                self.helper.pause_instance(data[0])
+                logging.info("Instance {0} paused".format(data[0]))
             else:
                 logging.warning(
-                    "Instance for product_id {0} not found, so cannot be suspended".format(params.get('id')))
+                    "Instance for product_id {0} not found, so cannot be paused".format(params.get('id')))
             return None
 
         elif command == "resume":
@@ -292,15 +292,15 @@ class VMDaemon(object):
             self.conn.commit()
             if data:
                 i_status, _ = self.helper.get_instance_status(data[0])
-                if i_status != 'SUSPENDED':
-                    logging.warning("The instance status for product_id {0} is not 'SUSPENDED' , so it cannot resumed".format(
+                if i_status != 'PAUSED':
+                    logging.warning("The instance status for product_id {0} is not 'PAUSED' , so it cannot resumed".format(
                         params.get('user')))
                     return None
-                self.helper.resume_instance(data[0])
-                logging.info("Instance {0} resumed".format(data[0]))
+                self.helper.unpause_instance(data[0])
+                logging.info("Instance {0} unpaused".format(data[0]))
             else:
                 logging.warning(
-                    "Instance for product_id {0} not found, so cannot be resumed".format(params.get('id')))
+                    "Instance for product_id {0} not found, so cannot be unpaused".format(params.get('id')))
             return None
 
         # TODO

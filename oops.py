@@ -145,3 +145,12 @@ class oops_helper(object):
     def suspend_instance(self, instance_id):
         self.conn.compute.suspend_server(instance_id)
         return True
+
+    def pause_instance(self, instance_id):
+        self.conn.compute.pause_server(instance_id)
+        return True
+
+    def unpause_instance(self, instance_id):
+        self.conn.compute.unpause_server(instance_id)
+        return True
+
