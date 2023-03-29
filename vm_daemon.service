@@ -2,6 +2,8 @@
 Description=VM Daemon
 
 [Service]
+Restart=always
+RestartSec=10
 ExecStart=/bin/env python3 /opt/billmgr/vm_daemon.py
 
 [Install]
