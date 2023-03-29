@@ -1,10 +1,12 @@
 [Unit]
 Description=VM Daemon
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
-Restart=always
-RestartSec=10
 ExecStart=/bin/env python3 /opt/billmgr/vm_daemon.py
+Restart=on-failure
+RestartSec=1s
 
 [Install]
 WantedBy=multi-user.target
