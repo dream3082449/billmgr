@@ -9,7 +9,7 @@ from daemon import pidfile
 import MySQLdb
 from oops import oops_helper
 
-debug_p = True
+debug_p = False
 
 def createConfig():
     sys_path = Path("/etc/vm_daemon/settings.ini")
