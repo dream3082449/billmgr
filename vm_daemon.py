@@ -159,7 +159,7 @@ class VMDaemon(object):
             gpu_extra_list = list()
             for cnt, i in enumerate(vgpus):
                 sname = config.get('openstack', i)
-                gpu_extra_list.append("{0}-{1}:1".format(cnt,sname,))
+                gpu_extra_list.append("{0}:1".format(sname,)) # 1 is count of gpu needed
 
             gpu_extra_str = ",".join(gpu_extra_list)
             flavor_extra_specs = {'pci_passthrough:alias': gpu_extra_str}
