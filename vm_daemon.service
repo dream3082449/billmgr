@@ -4,7 +4,8 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
-ExecStart=/bin/env python3 /opt/billmgr/vm_daemon.py
+Type=simple
+ExecStart=/usr/bin/python3 /opt/billmgr/vm_daemon.py
 Restart=on-failure
 RestartSec=10s
 
