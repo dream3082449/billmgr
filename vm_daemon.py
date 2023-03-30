@@ -37,7 +37,7 @@ def createConfig():
 
     config_default.add_section('openstack')
     config_default.set("openstack","use_network", "private")
-    config_default.set("openstack","vgpu1080", "1080Ti")
+    config_default.set("openstack","vgpu1080", "0-1080Ti:1,1-1080Ti:1")
     config_default.set("openstack","vgpu1050", "1050Ti")
 
     if not sys_path.exists():
@@ -159,7 +159,7 @@ class VMDaemon(object):
             gpu_extra_list = list()
             for cnt, i in enumerate(vgpus):
                 sname = config.get('openstack', i)
-                gpu_extra_list.append("{0}:1".format(sname,)) # 1 is count of gpu needed
+                gpu_extra_list.append(sname)
 
             gpu_extra_str = ",".join(gpu_extra_list)
             flavor_extra_specs = {'pci_passthrough:alias': gpu_extra_str}
